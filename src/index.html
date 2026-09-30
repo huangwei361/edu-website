@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="面向义务教育阶段的教学生成软件公司（筹备中）：按课标与教材版本一键生成 AI 互动课堂与教学内容，对标清华大学开源 OpenMAIC。本页面为公司品牌官网原型。">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBiMTIyMCIvPjxwYXRoIGQ9Ik04IDIyVjEyaDJ2MTBIOHptNC01di01aDJ2NWgtMnptNCAwdi05aDJ2OWgtMnptNCA1VjloMnYxM2gtMnoiIGZpbGw9IiNmZmZmZmYiLz48L3N2Zz4=">
+<title>启课 · 义务教育教学生成平台（暂定名）</title>
+<style>
+/* ============================================================
+   科技证据风 · Technology Evidence System
+   浅色表面 / 深色文字 / 单一行动色 / 4px 刻度 / 圆角<=8px
+   ============================================================ */
+:root{
+  --canvas:#ffffff;
+  --canvas-subtle:#f5f6f8;
+  --canvas-tint:#eef3fb;
+  --canvas-inverse:#0b1220;
+  --text:#16181d;
+  --text-muted:#5f6672;
+  --text-inverse:#ffffff;
+  --line:#d9dde4;
+  --line-strong:#8b93a1;
+  --action:#1457d9;
+  --action-hover:#0f47b7;
+  --focus:#005fcc;
+  --info:#1769aa;
+  --success:#1f7a45;
+  --danger:#b42318;
+  --warning:#9a5b00;
+  --reading:720px;
+  --content:1080px;
+  --wide:1280px;
+  --r-sm:4px;
+  --r-md:8px;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html:focus-within{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  color:var(--text);
+  background:var(--canvas);
+  letter-spacing:0;
+}
+body.menu-locked{overflow:hidden;}
+img,svg{display:block;max-width:100%;}
+a{color:var(--action);text-decoration:underline;text-underline-offset:3px;}
+a:hover{color:var(--action-hover);}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:2px;}
+.skip-link{
+  position:absolute;left:16px;top:-64px;z-index:200;
+  background:var(--canvas-inverse);color:var(--text-inverse);
+  padding:12px 20px;border-radius:var(--r-sm);
+  text-decoration:none;font-size:14px;font-weight:600;
+}
+.skip-link:focus{top:12px;color:var(--text-inverse);}
+.container{width:100%;max-width:var(--content);margin:0 auto;padding:0 24px;}
+.container-wide{width:100%;max-width:var(--wide);margin:0 auto;padding:0 24px;}
+.container-reading{width:100%;max-width:var(--reading);margin:0 auto;padding:0 24px;}
+section{scroll-margin-top:88px;}
+.note-tag{
+  display:inline-block;font-size:12px;line-height:1.4;font-weight:600;
+  color:var(--text-muted);border:1px solid var(--line-strong);
+  border-radius:999px;padding:3px 10px;letter-spacing:.02em;
+}
+h1,h2,h3,h4,p{margin:0;}
+h1{font-size:56px;line-height:1.12;font-weight:700;letter-spacing:-.01em;}
+h2{font-size:44px;line-height:1.16;font-weight:700;}
+h3{font-size:24px;line-height:1.3;font-weight:600;}
+h4{font-size:18px;line-height:1.4;font-weight:600;}
+.lead{font-size:18px;line-height:1.55;color:var(--text-muted);}
+.label{font-size:14px;line-height:1.4;font-weight:600;color:var(--text-muted);letter-spacing:.02em;}
+.meta{font-size:14px;line-height:1.5;color:var(--text-muted);}
+.footnote{font-size:12px;line-height:1.65;color:var(--text-muted);}
+.section-head{margin-bottom:48px;}
+.section-head .label{margin-bottom:12px;display:block;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:12px 24px;border-radius:6px;
+  font-size:16px;font-weight:600;line-height:1;
+  text-decoration:none;cursor:pointer;border:1.5px solid transparent;
+  transition:background-color .15s ease,border-color .15s ease,color .15s ease;
+}
+.btn-primary{background:var(--action);color:#fff;}
+.btn-primary:hover{background:var(--action-hover);color:#fff;}
+.btn-secondary{
+  background:transparent;color:var(--text);border-color:var(--line-strong);
+}
+.btn-secondary:hover{border-color:var(--text);background:var(--canvas-subtle);color:var(--text);}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+.btn[disabled]{opacity:.55;cursor:not-allowed;}
+.icon{width:20px;height:20px;flex:none;}
+
+/* ---------- 全局导航 ---------- */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.92);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:saturate(1.4) blur(6px);
+}
+.nav-row{display:flex;align-items:center;gap:24px;min-height:64px;}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:16px;}
+.brand-mark{width:32px;height:32px;border-radius:6px;background:var(--canvas-inverse);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+.brand .dash{display:block;font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;}
+.nav-links a{
+  display:inline-flex;align-items:center;min-height:44px;padding:0 14px;
+  color:var(--text);text-decoration:none;font-size:15px;font-weight:500;border-radius:6px;
+}
+.nav-links a:hover{background:var(--canvas-subtle);color:var(--text);}
+.nav-links a.current{color:var(--action);font-weight:600;}
+.nav-cta{margin-left:8px;}
+.nav-burger{
+  display:none;margin-left:auto;width:44px;height:44px;align-items:center;justify-content:center;
+  border:1px solid var(--line-strong);border-radius:6px;background:var(--canvas);cursor:pointer;
+}
+.nav-burger[aria-expanded="true"]{background:var(--canvas-subtle);}
+
+/* ---------- Hero ---------- */
+.hero{background:var(--canvas);border-bottom:1px solid var(--line);}
+.hero-band{padding:80px 0 24px;}
+.hero-kicker{margin-bottom:20px;}
+.hero-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:start;}
+.hero-copy h1{margin:20px 0 24px;}
+.hero-copy .lead{max-width:540px;margin-bottom:32px;}
+.hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:40px;}
+.hero-next{
+  display:flex;align-items:center;gap:10px;
+  color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;
+}
+.hero-next:hover{color:var(--action);}
+.hero-next .icon{transition:transform .15s ease;}
+.hero-next:hover .icon{transform:translateY(2px);}
+.hero-facts{display:flex;flex-wrap:wrap;gap:12px 28px;padding-top:24px;border-top:1px solid var(--line);}
+.fact-item .fact-k{font-size:12px;color:var(--text-muted);font-weight:600;}
+.fact-item .fact-v{font-size:14px;font-weight:600;margin-top:2px;}
+
+/* ---------- 概念工作台 ---------- */
+.product-proof{margin-top:48px;}
+.proof-note{
+  display:flex;align-items:center;gap:8px;margin-bottom:12px;
+  font-size:12px;color:var(--text-muted);
+}
+.proof-note .dot{width:8px;height:8px;border-radius:50%;background:var(--success);flex:none;}
+.workbench{
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  background:var(--canvas-subtle);box-shadow:0 1px 0 rgba(22,24,29,.04);
+}
+.wb-titlebar{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:var(--canvas);border-bottom:1px solid var(--line);
+}
+.wb-dots{display:flex;gap:6px;}
+.wb-dots i{width:10px;height:10px;border-radius:50%;background:var(--line);}
+.wb-dots i:first-child{background:#e55b4c;}
+.wb-dots i:nth-child(2){background:#e0a13c;}
+.wb-dots i:nth-child(3){background:#4caf7d;}
+.wb-title{font-size:13px;color:var(--text-muted);font-family:var(--mono);}
+.wb-status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--success);}
+.wb-status .dot{width:8px;height:8px;border-radius:50%;background:var(--success);}
+.wb-body{display:grid;grid-template-columns:minmax(0,300px) minmax(0,220px) minmax(0,1fr);gap:1px;background:var(--line);}
+.wb-pane{background:var(--canvas);padding:16px;min-width:0;}
+.wb-pane h4{font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.wb-pane h4 .icon{width:16px;height:16px;color:var(--action);}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px;}
+.field .box{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  border:1px solid var(--line);border-radius:6px;padding:8px 10px;
+  font-size:13px;background:var(--canvas);
+}
+.field .box .chev{color:var(--text-muted);font-family:var(--mono);}
+.list-fill{display:flex;flex-direction:column;gap:6px;}
+.list-fill .item{
+  border:1px solid var(--line);border-radius:6px;padding:8px 10px;
+  font-size:13px;display:flex;align-items:center;gap:8px;background:var(--canvas-subtle);
+}
+.list-fill .item.active{border-color:var(--action);background:var(--canvas-tint);font-weight:600;color:var(--action);}
+.list-fill .item .num{font-family:var(--mono);font-size:11px;color:var(--text-muted);}
+.wb-center{display:flex;flex-direction:column;justify-content:center;gap:10px;}
+.gen-step{display:flex;align-items:center;gap:8px;font-size:13px;border:1.5px dashed var(--line-strong);border-radius:6px;padding:8px 10px;color:var(--text-muted);}
+.gen-step.active{border-style:solid;border-color:var(--action);background:var(--canvas-tint);color:var(--text);font-weight:600;}
+.gen-step .k{width:20px;height:20px;border-radius:50%;background:var(--canvas);border:1px solid var(--line-strong);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);flex:none;}
+.gen-step.active .k{background:var(--action);border-color:var(--action);color:#fff;}
+.gen-pulse{
+  display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 0;
+}
+.gen-pulse i{width:5px;height:5px;border-radius:50%;background:var(--action);animation:pl 1.2s infinite ease-in-out;}
+.gen-pulse i:nth-child(2){animation-delay:.15s;}
+.gen-pulse i:nth-child(3){animation-delay:.3s;}
+.gen-pulse i:nth-child(4){animation-delay:.45s;}
+@keyframes pl{0%,80%,100%{opacity:.25;transform:scale(.8);}40%{opacity:1;transform:scale(1.1);}}
+.gen-spec{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;justify-content:center;font-family:var(--mono);}
+.slide-card{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--canvas-subtle);}
+.slide-head{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--canvas);font-size:12px;font-weight:600;}
+.slide-head .tag{font-size:10px;font-family:var(--mono);color:var(--text-muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-left:auto;}
+.slide-body{padding:12px;display:grid;gap:8px;}
+.slide-row{display:flex;align-items:center;gap:8px;font-size:12px;}
+.slide-row .p{font-family:var(--mono);font-size:11px;color:var(--action);width:44px;flex:none;}
+.slide-bar{flex:1;height:16px;border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:10px;color:var(--text-muted);border:1px solid var(--line);background:var(--canvas);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.slide-bar.ok{color:var(--success);border-color:rgba(31,122,69,.35);}
+.slide-bar.act{border-color:var(--action);color:var(--action);font-weight:600;background:var(--canvas-tint);}
+.slide-fig{margin-top:2px;border:1px solid var(--line);background:var(--canvas);border-radius:6px;padding:10px;display:flex;align-items:center;justify-content:center;gap:16px;}
+.slide-fig .prim{width:52px;height:34px;border:2px solid var(--action);border-radius:4px;position:relative;}
+.slide-fig .prim::after{content:"";position:absolute;left:6px;top:6px;right:6px;height:2px;background:var(--line);box-shadow:0 7px 0 var(--line),0 14px 0 var(--line);}
+.slide-fig .angle{color:var(--text-muted);font-size:12px;font-family:var(--mono);}
+.wb-foot{
+  display:flex;align-items:center;gap:16px;padding:10px 16px;background:var(--canvas);
+  border-top:1px solid var(--line);font-size:12px;color:var(--text-muted);
+}
+.wb-foot .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:11px;}
+.wb-foot .pill .ok-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
+.wb-foot .pill .warn{color:var(--warning);font-family:var(--mono);}
+.wb-foot .grow{flex:1;}
+.proof-caption{margin-top:12px;font-size:12px;color:var(--text-muted);}
+
+/* ---------- 通用 band ---------- */
+.band{padding:96px 0;}
+.band-subtle{background:var(--canvas-subtle);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.band-inverse{background:var(--canvas-inverse);color:var(--text-inverse);}
+.band-inverse .label,.band-inverse .meta,.band-inverse .lead,.band-inverse .footnote{color:#b9c1cf;}
+.band-inverse h2{color:#fff;}
+
+/* ---------- 工作流 ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;counter-reset:step;}
+.step{
+  position:relative;padding:0 24px;border-left:1px solid var(--line);
+}
+.step:first-child{border-left:none;padding-left:0;}
+.step .step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:8px;background:var(--canvas-tint);
+  border:1px solid rgba(20,87,217,.35);color:var(--action);
+  font-size:18px;font-weight:700;font-family:var(--mono);margin-bottom:16px;
+}
+.step h3{margin:0 0 10px;}
+.step p{margin:0;color:var(--text-muted);font-size:15px;line-height:1.6;}
+.step-arrow{display:none;}
+
+/* ---------- 能力卡 ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
+.card{
+  border:1px solid var(--line);border-radius:8px;background:var(--canvas);
+  padding:24px;display:flex;flex-direction:column;gap:12px;
+}
+.card .icon{width:24px;height:24px;color:var(--action);}
+.card h3{margin:0;}
+.card p{margin:0;font-size:14px;line-height:1.6;color:var(--text-muted);flex:1;}
+.card .card-meta{font-size:12px;color:var(--text-muted);border-top:1px solid var(--line);padding-top:12px;}
+
+/* ---------- 几何引擎 ---------- */
+.engine-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:64px;align-items:start;}
+.pipeline{display:flex;flex-direction:column;gap:0;}
+.pipe{
+  position:relative;display:grid;grid-template-columns:56px minmax(0,1fr);gap:20px;
+  padding:20px 0;
+}
+.pipe::before{content:"";position:absolute;left:27px;top:56px;bottom:-2px;width:2px;background:var(--line);}
+.pipe:last-child::before{display:none;}
+.pipe .pn{
+  width:56px;height:56px;border-radius:8px;background:var(--canvas);
+  border:1.5px solid var(--line-strong);display:inline-flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text);z-index:1;
+}
+.pipe .pn.ok{border-color:var(--success);color:var(--success);background:rgba(31,122,69,.06);}
+.pipe .pn.sys{border-color:var(--action);color:var(--action);background:var(--canvas-tint);}
+.pipe h3{margin:2px 0 8px;}
+.pipe p{margin:0;color:var(--text-muted);font-size:15px;line-height:1.6;max-width:520px;}
+.pipe .pipe-meta{margin-top:10px;font-size:12px;color:var(--text-muted);font-family:var(--mono);}
+.evidence-panel{
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--canvas);
+}
+.evidence-panel .ep-head{
+  display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);
+  background:var(--canvas-subtle);font-size:14px;font-weight:600;
+}
+.evidence-panel .ep-head .icon{width:18px;height:18px;color:var(--action);}
+.ep-body{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.geo-demo{border:1px solid var(--line);border-radius:6px;background:var(--canvas-subtle);padding:14px;display:flex;align-items:center;justify-content:center;gap:18px;}
+.geo-demo svg{flex:none;}
+.geo-meta{font-family:var(--mono);font-size:12px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px;}
+.geo-check{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 0;border-bottom:1px dashed var(--line);}
+.geo-check:last-child{border-bottom:none;}
+.geo-check .ok{color:var(--success);font-weight:700;flex:none;}
+.geo-check .ko{color:var(--danger);font-weight:700;flex:none;}
+.ep-foot{padding:12px 16px;border-top:1px solid var(--line);background:var(--canvas-subtle);font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
+
+/* ---------- 基准对比 ---------- */
+.compare-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;}
+.compare{width:100%;border-collapse:collapse;min-width:860px;background:var(--canvas);}
+.compare th,.compare td{
+  padding:14px 16px;text-align:left;vertical-align:top;
+  border-bottom:1px solid var(--line);font-size:14px;line-height:1.55;
+}
+.compare thead th{background:var(--canvas-subtle);font-weight:600;font-size:14px;}
+.compare thead th.col-diff{background:var(--canvas-tint);}
+.compare td.dim{font-weight:600;color:var(--text);width:140px;background:var(--canvas-subtle);}
+.compare tbody tr:last-child th,.compare tbody tr:last-child td{border-bottom:none;}
+.compare td.col-diff{background:rgba(20,87,217,.05);}
+.compare .cmp-name{display:block;font-weight:600;margin-bottom:2px;}
+.compare .cmp-tag{font-size:12px;color:var(--text-muted);font-weight:500;}
+.scroll-hint{display:none;font-size:12px;color:var(--text-muted);margin-top:10px;}
+.compare-src{margin-top:12px;}
+
+/* ---------- 差异化四列 ---------- */
+.diff-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:48px;}
+.diff-card{border:1px solid var(--line);border-radius:8px;padding:24px;background:var(--canvas);}
+.diff-card .diff-k{font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.diff-card .diff-k .bar{width:4px;height:18px;border-radius:2px;background:var(--action);}
+.diff-card h4{margin:0 0 8px;}
+.diff-card p{margin:0;font-size:14px;line-height:1.6;color:var(--text-muted);}
+
+/* ---------- 公司 band ---------- */
+.company-band{padding:96px 0;}
+.company-grid{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:64px;}
+.company-copy .lead{margin-bottom:32px;}
+.pill-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;}
+.pill-list li{
+  display:flex;gap:12px;padding:16px 0;border-bottom:1px solid var(--line);
+  font-size:15px;line-height:1.6;
+}
+.pill-list li:last-child{border-bottom:none;}
+.pill-list .mark{color:var(--action);font-weight:700;flex:none;}
+.pill-list b{font-weight:600;}
+.place-box{border:1px dashed var(--line-strong);border-radius:8px;padding:20px;background:var(--canvas-subtle);}
+.place-box .label{margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.place-box .icon{width:18px;height:18px;color:var(--warning);}
+
+/* ---------- 联系 ---------- */
+.contact-band{background:var(--canvas-subtle);border-top:1px solid var(--line);}
+.contact-grid{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:64px;align-items:start;}
+.form{display:flex;flex-direction:column;gap:16px;}
+.f-group{display:flex;flex-direction:column;gap:6px;}
+.f-group label{font-size:14px;font-weight:600;}
+.f-group .req{color:var(--danger);}
+.f-group input,.f-group textarea{
+  width:100%;font-family:var(--sans);font-size:16px;line-height:1.4;
+  padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:6px;
+  background:var(--canvas);color:var(--text);min-height:48px;
+}
+.f-group textarea{min-height:120px;resize:vertical;}
+.f-group input:focus,.f-group textarea:focus{outline:none;border-color:var(--focus);box-shadow:0 0 0 3px rgba(0,95,204,.18);}
+.f-group .err-msg{display:none;font-size:13px;color:var(--danger);}
+.f-group.invalid input,.f-group.invalid textarea{border-color:var(--danger);}
+.f-group.invalid .err-msg{display:block;}
+.form-status[role="status"]{display:none;padding:14px 16px;border-radius:6px;font-size:14px;font-weight:600;}
+.form-status.ok{display:block;background:rgba(31,122,69,.08);border:1px solid rgba(31,122,69,.4);color:var(--success);}
+.form-status.err{display:block;background:rgba(180,35,24,.07);border:1px solid rgba(180,35,24,.4);color:var(--danger);}
+.contact-aside{display:flex;flex-direction:column;gap:16px;}
+.contact-card{border:1px solid var(--line);border-radius:8px;padding:20px;background:var(--canvas);}
+.contact-card h4{margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+.contact-card .icon{width:18px;height:18px;color:var(--action);}
+.contact-card p{margin:0;font-size:14px;color:var(--text-muted);line-height:1.7;}
+.contact-card .mono{font-family:var(--mono);color:var(--text);}
+
+/* ---------- footer ---------- */
+.site-footer{background:var(--canvas-inverse);color:#b9c1cf;padding:56px 0 32px;font-size:14px;}
+.site-footer .f-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;}
+.site-footer h4{color:#fff;margin:0 0 14px;font-size:14px;}
+.site-footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.site-footer a{color:#b9c1cf;text-decoration:none;}
+.site-footer a:hover{color:#fff;}
+.f-bottom{margin-top:48px;padding-top:24px;border-top:1px solid rgba(185,193,207,.2);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:12px;}
+
+/* ---------- 移动菜单 ---------- */
+.mobile-menu{
+  display:none;position:fixed;inset:64px 0 0 0;z-index:120;
+  background:var(--canvas);border-top:1px solid var(--line);
+  overflow-y:auto;padding:24px;
+}
+.mobile-menu.open{display:grid;gap:4px;align-content:start;}
+.mobile-menu a{
+  display:flex;align-items:center;min-height:48px;padding:0 12px;border-radius:6px;
+  font-size:17px;font-weight:600;color:var(--text);text-decoration:none;
+}
+.mobile-menu a:hover{background:var(--canvas-subtle);}
+.mobile-menu .m-cta{margin-top:16px;}
+
+/* ---------- 媒体查询 ---------- */
+@media (max-width:1024px){
+  .hero-grid{grid-template-columns:1fr;gap:40px;}
+  .engine-grid{grid-template-columns:1fr;gap:40px;}
+  .company-grid,.contact-grid{grid-template-columns:1fr;gap:48px;}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px;}
+  .step:nth-child(3){border-left:none;padding-left:0;}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .diff-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:767px){
+  h1{font-size:40px;line-height:1.15;}
+  h2{font-size:32px;line-height:1.2;}
+  h3{font-size:20px;}
+  .lead{font-size:17px;}
+  .band{padding:72px 0;}
+  .container,.container-wide{padding:0 20px;}
+  .hero-band{padding:56px 0 0;}
+  .hero-actions{flex-direction:column;align-items:stretch;}
+  .hero-actions .btn{justify-content:center;}
+  .nav-links{display:none;}
+  .nav-burger{display:inline-flex;}
+  .wb-body{grid-template-columns:1fr;}
+  .wb-center{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;}
+  .gen-step{flex:1 1 46%;}
+  .steps{grid-template-columns:1fr;row-gap:0;}
+  .step{border-left:none;border-top:1px solid var(--line);padding:24px 0 0;margin-top:8px;}
+  .step:first-child{border-top:none;margin-top:0;padding-top:0;}
+  .step .step-num{width:40px;height:40px;font-size:16px;margin-bottom:12px;}
+  .cards{grid-template-columns:1fr;}
+  .diff-grid{grid-template-columns:1fr;margin-top:40px;}
+  .scroll-hint{display:flex;align-items:center;gap:6px;}
+  .compare th,.compare td{padding:12px;font-size:13px;}
+  .compare td.dim{width:110px;}
+  .contact-grid{gap:40px;}
+  .site-footer .f-grid{grid-template-columns:1fr;gap:28px;}
+}
+@media (min-width:2560px){
+  body{zoom:1.08;}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- ======================= 导航 ======================= -->
+<header class="site-header">
+  <div class="container-wide nav-row">
+    <a class="brand" href="#hero" aria-label="启课（暂定品牌名）首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg>
+      </span>
+      <span>启课<span class="dash">教学生成平台 · 暂定名</span></span>
+    </a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#workflow">生成流程</a>
+      <a href="#capabilities">生成能力</a>
+      <a href="#geometry-engine">几何引擎</a>
+      <a href="#benchmark">对标参考</a>
+      <a href="#company">关于公司</a>
+      <a class="btn btn-primary nav-cta" href="#contact">联系团队</a>
+    </nav>
+    <button class="nav-burger" id="nav-burger" aria-expanded="false" aria-controls="mobile-menu" aria-label="打开菜单">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-menu" id="mobile-menu" aria-label="移动端主导航" hidden>
+  <a href="#workflow">生成流程</a>
+  <a href="#capabilities">生成能力</a>
+  <a href="#geometry-engine">几何引擎</a>
+  <a href="#benchmark">对标参考</a>
+  <a href="#company">关于公司</a>
+  <a class="btn btn-primary m-cta" href="#contact">联系团队</a>
+</nav>
+
+<main id="main">
+<!-- ======================= 1. Hero ======================= -->
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <div class="container-wide hero-band">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="note-tag hero-kicker">义务教育教学生成软件 · 公司筹备中</span>
+        <h1 id="hero-title">输入教材章节，<br>一键生成 AI 互动课堂</h1>
+        <p class="lead">面向小学与初中教师，按国家课程标准与教材版本（人教、北师大、苏教等）自动生成课件、互动课堂、作业与几何图形。技术路线对标清华大学开源项目 OpenMAIC，聚焦义务教育场景做可核验的本地化生成。</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#capabilities">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>
+            了解产品平台
+          </a>
+          <a class="btn btn-secondary" href="#workflow">查看生成流程</a>
+        </div>
+        <a class="hero-next" href="#workflow">
+          下一节：平台怎么用（生成流程）
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+        </a>
+      </div>
+      <div class="product-proof">
+        <p class="proof-note"><span class="dot" aria-hidden="true"></span>概念界面示意：展示计划中的产品交互形态，非真实产品截图</p>
+        <div class="workbench" role="img" aria-label="概念界面示意：选择教材章节后一键生成课堂内容，分为章节输入、AI 生成、课堂输出三个面板">
+          <div class="wb-titlebar">
+            <span class="wb-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="wb-title">Qike Teaching Studio · prototype</span>
+            <span class="wb-status"><span class="dot" aria-hidden="true"></span>生成引擎就绪</span>
+          </div>
+          <div class="wb-body">
+            <!-- 输入面板 -->
+            <div class="wb-pane">
+              <h4><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>章节输入</h4>
+              <div class="field">
+                <label for="demo-version">教材版本</label>
+                <div class="box" id="demo-version">人教版 · 数学 <span class="chev">▾</span></div>
+              </div>
+              <div class="field">
+                <label>学段 / 年级</label>
+                <div class="box">七年级 <span class="chev">▾</span></div>
+              </div>
+              <div class="field">
+                <label>当前章节</label>
+                <div class="list-fill">
+                  <span class="item active"><span class="num">07</span>相交线与平行线</span>
+                  <span class="item"><span class="num">08</span>实数</span>
+                  <span class="item"><span class="num">09</span>平面直角坐标系</span>
+                </div>
+              </div>
+            </div>
+            <!-- 生成面板 -->
+            <div class="wb-pane wb-center">
+              <div class="gen-step active"><span class="k" aria-hidden="true">1</span>解析课标与章节</div>
+              <div class="gen-step active"><span class="k" aria-hidden="true">2</span>生成课件大纲</div>
+              <div class="gen-step active"><span class="k" aria-hidden="true">3</span>校核知识点与题型</div>
+              <div class="gen-pulse" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <div class="gen-spec">确定性几何引擎 · 已通过验证</div>
+            </div>
+            <!-- 输出面板 -->
+            <div class="wb-pane">
+              <h4><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>课堂输出</h4>
+              <div class="slide-card">
+                <div class="slide-head">课件 · 相交线与平行线 <span class="tag">P3/9</span></div>
+                <div class="slide-body">
+                  <div class="slide-row"><span class="p">目标</span><span class="slide-bar act">理解对顶角、邻补角概念</span></div>
+                  <div class="slide-row"><span class="p">讲解</span><span class="slide-bar ok">尺规几何 · 确定性图形</span></div>
+                  <div class="slide-row"><span class="p">互动</span><span class="slide-bar ok">3 个课堂任务已就绪</span></div>
+                  <div class="slide-fig" aria-label="几何图形示例：带直角的三角形与角度标注">
+                    <span class="prim" aria-hidden="true"></span>
+                    <span class="angle">∠1 = ∠2 = 90°</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wb-foot">
+            <span class="pill"><span class="ok-dot" aria-hidden="true"></span>课标映射：已匹配</span>
+            <span class="pill">知识点：<span class="warn">6 / 6 通过</span></span>
+            <span class="grow"></span>
+            <span class="pill" style="border-color:var(--action);color:var(--action);font-weight:600;">教师审校后发布</span>
+          </div>
+        </div>
+        <p class="proof-caption">上图为产品概念示意（确定性界面），由本页代码构建，用于说明「输入章节 → 生成 → 课堂输出」的交互形态；正式产品界面以开发为准。</p>
+      </div>
+    </div>
+    <div class="hero-facts">
+      <div class="fact-item"><div class="fact-k">目标学段</div><div class="fact-v">小学 · 初中（1–9 年级）</div></div>
+      <div class="fact-item"><div class="fact-k">生成内容</div><div class="fact-v">课件 / 互动课堂 / 作业 / 几何图形</div></div>
+      <div class="fact-item"><div class="fact-k">技术路线</div><div class="fact-v">对标清华开源 OpenMAIC</div></div>
+      <div class="fact-item"><div class="fact-k">项目状态</div><div class="fact-v">公司筹备中 · 待注册</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 2. 工作流 ======================= -->
+<section class="band band-subtle" id="workflow" aria-labelledby="wf-title">
+  <div class="container">
+    <div class="section-head">
+      <span class="label">平台怎么用 · 四步生成流程</span>
+      <h2 id="wf-title">从教材章节到课堂，四步完成</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num" aria-hidden="true">01</span>
+        <h3>选择教材章节</h3>
+        <p>选择学段、学科、教材版本与章节。系统识别课标要求与章节知识点结构。</p>
+      </div>
+      <div class="step">
+        <span class="step-num" aria-hidden="true">02</span>
+        <h3>AI 一键生成</h3>
+        <p>按课标与教材映射生成课件大纲、互动任务、随堂测评与图形素材，几分钟内完成。</p>
+      </div>
+      <div class="step">
+        <span class="step-num" aria-hidden="true">03</span>
+        <h3>教师审校修改</h3>
+        <p>逐页检查教学目标、知识点与题型设置，可局部调整或重新生成，教师掌握最终决定权。</p>
+      </div>
+      <div class="step">
+        <span class="step-num" aria-hidden="true">04</span>
+        <h3>发布授课</h3>
+        <p>推送到课堂班级，学生在教师控制下参与互动任务与即时评测，结果回传教师端。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 3. 能力 ======================= -->
+<section class="band" id="capabilities" aria-labelledby="cap-title">
+  <div class="container">
+    <div class="section-head">
+      <span class="label">平台能生成什么 · 能力预览</span>
+      <h2 id="cap-title">四类核心生成能力</h2>
+      <p class="lead" style="margin-top:16px;">围绕义务教育教学常态场景设计，全部内容生成后均以「教师审校、可编辑、可重新生成」为交付前提。</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <h3>课件生成</h3>
+        <p>按章节与课标自动生成课件：教学目标、讲解顺序、板书要点、示例与小结，适配课堂讲解节奏。</p>
+        <div class="card-meta">覆盖 1–9 年级主要学科（规划中）</div>
+      </article>
+      <article class="card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <h3>作业与评测</h3>
+        <p>按知识点生成随堂练习、课后作业与单元测验，标注难度与课标对应关系，支持教师调整题量。</p>
+        <div class="card-meta">知识点 → 题型映射（规划中）</div>
+      </article>
+      <article class="card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <h3>互动课堂</h3>
+        <p>生成课堂提问、小组任务、即时反馈与游戏化环节，学生端与教师端实时联动。</p>
+        <div class="card-meta">课堂任务模板库（规划中）</div>
+      </article>
+      <article class="card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/><path d="M12 8v4l3 3"/></svg>
+        <h3>几何图形引擎</h3>
+        <p>按描述生成精确的几何图形、尺规作图演示与角度标注，图形经过验证器校核，可用于课堂直接演示。</p>
+        <div class="card-meta">详见下节：四段式生成机制</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 4. 几何引擎 ======================= -->
+<section class="band band-subtle" id="geometry-engine" aria-labelledby="geo-title">
+  <div class="container">
+    <div class="section-head">
+      <span class="label">关键壁垒 · 为什么图形内容可靠</span>
+      <h2 id="geo-title">四段式几何内容生成引擎</h2>
+      <p class="lead" style="margin-top:16px;">数学、物理等学科对图形有确定性要求。我们不依赖"画得差不多"的生成，而是把教材图元转成可验证的结构化描述。</p>
+    </div>
+    <div class="engine-grid">
+      <div class="pipeline">
+        <div class="pipe">
+          <span class="pn" aria-hidden="true">1</span>
+          <div>
+            <h3>符号化建模</h3>
+            <p>把教材中的图形与文字描述转成结构化 DSL：点、线、角、圆及约束关系，随版本入库管理。</p>
+            <div class="pipe-meta">示例：∠AOB = 90°，|AB| = 6，点 C 为 AB 中点</div>
+          </div>
+        </div>
+        <div class="pipe">
+          <span class="pn sys" aria-hidden="true">2</span>
+          <div>
+            <h3>确定性渲染</h3>
+            <p>几何约束求解器根据模型生成图形，同一输入永远得到同一输出，可复现、可回归、可单测。</p>
+            <div class="pipe-meta">确定性：同输入 → 同输出 → 可回归测试</div>
+          </div>
+        </div>
+        <div class="pipe">
+          <span class="pn sys" aria-hidden="true">3</span>
+          <div>
+            <h3>验证器三件套</h3>
+            <p>数量校验（图形规模）、关系校验（垂直/平行/相等）、标签校验（标注与题意一致），任一失败即拒绝输出。</p>
+            <div class="pipe-meta">未通过验证的图形不进入课件</div>
+          </div>
+        </div>
+        <div class="pipe">
+          <span class="pn ok" aria-hidden="true">4</span>
+          <div>
+            <h3>导出与交付</h3>
+            <p>生成可交互课堂组件：尺规演示、角度标注、动态探究，与课件结构绑定，供教师一键嵌入。</p>
+            <div class="pipe-meta">输出：课件组件 / 可编辑图形 / 演示动画</div>
+          </div>
+        </div>
+      </div>
+      <aside class="evidence-panel">
+        <div class="ep-head"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/></svg>验证证据面板 · 概念示意</div>
+        <div class="ep-body">
+          <div class="geo-demo">
+            <svg width="120" height="84" viewBox="0 0 120 84" role="img" aria-label="验证器示例：三角形 ABC，AB 与 AC 相等，标注为等腰三角形">
+              <line x1="14" y1="72" x2="106" y2="72" stroke="#16181d" stroke-width="1.5"/>
+              <line x1="14" y1="72" x2="60" y2="10" stroke="#1457d9" stroke-width="2"/>
+              <line x1="106" y1="72" x2="60" y2="10" stroke="#1457d9" stroke-width="2"/>
+              <circle cx="36" cy="58" r="6" fill="#eef3fb" stroke="none"/>
+              <path d="M14 72 h8 l-4 6 z" fill="#16181d"/>
+              <path d="M106 72 h-8 l4 6 z" fill="#16181d"/>
+              <text x="4" y="72" font-size="10" font-family="Consolas,monospace" fill="#5f6672">A</text>
+              <text x="112" y="72" font-size="10" font-family="Consolas,monospace" fill="#5f6672">B</text>
+              <text x="52" y="10" font-size="10" font-family="Consolas,monospace" fill="#5f6672">C</text>
+              <text x="48" y="40" font-size="10" font-family="Consolas,monospace" fill="#5f6672">AB = AC ✓</text>
+            </svg>
+            <div class="geo-meta">
+              <span>model: iso-tri.abc</span>
+              <span>v1.3 · deterministic</span>
+            </div>
+          </div>
+          <div class="geo-check"><span class="ok" aria-hidden="true">✓</span>数量：点 3 · 线段 3 · 标注 1</div>
+          <div class="geo-check"><span class="ok" aria-hidden="true">✓</span>关系：AB = AC · ∠A 顶角</div>
+          <div class="geo-check"><span class="ok" aria-hidden="true">✓</span>标签：ABC 顶点标识一致</div>
+          <div class="geo-check"><span class="ko" aria-hidden="true">✗</span>冲突情况 → 拒绝输出，返回修改建议</div>
+        </div>
+        <div class="ep-foot"><svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>确定性约束：数列、函数图像、单位换算等场景复用同一机制（规划中）</div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 5. 对标参考 ======================= -->
+<section class="band" id="benchmark" aria-labelledby="bench-title">
+  <div class="container">
+    <div class="section-head">
+      <span class="label">对标参考 · 我们参照什么</span>
+      <h2 id="bench-title">与开源 OpenMAIC 的定位差异</h2>
+      <p class="lead" style="margin-top:16px;">OpenMAIC 是清华大学开源的 AI 内容生成引擎，面向大模型时代的多模态内容生产。本平台借鉴其生成式 AI 技术路线，但聚焦义务教育课堂这一具体场景，做可核验的本地化落地。以下对比基于 OpenMAIC 项目公开口径，而非我方运营数据。</p>
+    </div>
+    <div class="compare-wrap" tabindex="0" aria-label="OpenMAIC 与本平台对比表，可横向滚动">
+      <table class="compare">
+        <caption class="footnote" style="caption-side:bottom;padding:10px 16px 0;">单位/口径：OpenMAIC 数据来自其官方公开介绍（详情见下方来源注）。本平台一列为目标定位与规划方向，非已实现指标。</caption>
+        <thead>
+          <tr>
+            <th scope="col" style="width:140px;">对比维度</th>
+            <th scope="col">OpenMAIC（公开口径）</th>
+            <th scope="col" class="col-diff">启课 · 本平台（目标定位）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="dim">项目定位</th>
+            <td><span class="cmp-name">AI 内容生成开源引擎</span><span class="cmp-tag">由清华大学团队开源，面向通用内容生成</span></td>
+            <td class="col-diff"><span class="cmp-name">义务教育教学生成平台</span><span class="cmp-tag">面向 1–9 年级课堂的本地化产品（筹备中）</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="dim">目标用户</th>
+            <td>开发者与内容平台，通过开放能力接入</td>
+            <td class="col-diff">一线教师、学校与区域教学管理者，开箱即用</td>
+          </tr>
+          <tr>
+            <th scope="row" class="dim">公开量级</th>
+            <td><span class="cmp-name">58万+ 创作者 · 超100万门课程 · 3400万+ 次交互</span><span class="cmp-tag">覆盖 154 个国家和地区</span></td>
+            <td class="col-diff"><span class="cmp-name">尚无运营数据</span><span class="cmp-tag">处于筹备阶段，不对标其量级</span></td>
+          </tr>
+          <tr>
+            <th scope="row" class="dim">权威内容映射</th>
+            <td>开放平台内容生态，创作者自主产出</td>
+            <td class="col-diff">严格绑定国家课标与指定教材版本，章节级对齐</td>
+          </tr>
+          <tr>
+            <th scope="row" class="dim">图形内容可靠性</th>
+            <td>通用生成引擎，图形能力依模型表现</td>
+            <td class="col-diff">四段式几何引擎：符号化建模 → 确定性渲染 → 验证器校核 → 交付（本页前节）</td>
+          </tr>
+          <tr>
+            <th scope="row" class="dim">内容交付与审校</th>
+            <td>开放接口与创作工具</td>
+            <td class="col-diff">教师审校闭环：可编辑、可重新生成、可回传课堂数据</td>
+          </tr>
+          <tr>
+            <th scope="row" class="dim">开放方式</th>
+            <td>开源引擎，社区共建</td>
+            <td class="col-diff">商业产品（计划），核心引擎保留自研</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="scroll-hint"><svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>表格较宽时可在本区域内左右滑动查看</p>
+    <p class="footnote compare-src">来源：OpenMAIC 项目官方公开信息（项目主页与官方介绍，数据为发布时公开口径；截至本页面生成时可从官方渠道核验）。本页不展示我方任何未经验证的指标。</p>
+    <div class="diff-grid">
+      <div class="diff-card">
+        <span class="diff-k"><span class="bar" aria-hidden="true"></span>共同基础</span>
+        <h4>生成式 AI 技术路线</h4>
+        <p>借鉴 OpenMAIC 的多模态内容生成架构与开源生态思路，站在前人验证过的技术方向上起步，避免重复造轮子。</p>
+      </div>
+      <div class="diff-card">
+        <span class="diff-k"><span class="bar" aria-hidden="true"></span>场景专注</span>
+        <h4>只做义务教育课堂</h4>
+        <p>不追逐全学段全学科泛化，聚焦 1–9 年级日常教学，用场景深度换生成质量与教师体验。</p>
+      </div>
+      <div class="diff-card">
+        <span class="diff-k"><span class="bar" aria-hidden="true"></span>权威对齐</span>
+        <h4>课标 × 教材版本绑定</h4>
+        <p>内容与《义务教育课程标准》和各教材版本章节严格对齐，教学口径有据可查，这是课堂产品的信任基础。</p>
+      </div>
+      <div class="diff-card">
+        <span class="diff-k"><span class="bar" aria-hidden="true"></span>可核验交付</span>
+        <h4>图形与知识点可验证</h4>
+        <p>几何图形经确定性引擎与验证器校核，知识点与题型标注课标对应关系，教师可逐项核验后发布。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 6. 公司 ======================= -->
+<section class="band band-subtle" id="company" aria-labelledby="company-title">
+  <div class="container">
+    <div class="company-grid">
+      <div class="company-copy">
+        <div class="section-head" style="margin-bottom:24px;">
+          <span class="label">关于公司 · 筹备中</span>
+          <h2 id="company-title" style="font-size:40px;">让每一节义务教育课堂，<br>都有可核验的优质内容</h2>
+        </div>
+        <p class="lead">我们计划成立一家义务教育教学生成软件开发公司（名称待定、尚在筹备），以软件产品为核心交付：把「按课标、按教材版本一键生成 AI 互动课堂」做成教师真正愿意每天使用的工具。公司名称、品牌与 LOGO 均为占位，注册完成后将统一替换。</p>
+        <ul class="pill-list">
+          <li><span class="mark" aria-hidden="true">→</span><span><b>使命：</b>降低优质教学内容的制作门槛，让生成结果可检查、可修改、可负责。</span></li>
+          <li><span class="mark" aria-hidden="true">→</span><span><b>产品原则：</b>一切生成内容以「教师审校」为最终闭环，平台不替代教师的专业判断。</span></li>
+          <li><span class="mark" aria-hidden="true">→</span><span><b>技术路线：</b>对标清华开源 OpenMAIC，在数据、模型与工程上持续投入，核心引擎自研。</span></li>
+          <li><span class="mark" aria-hidden="true">→</span><span><b>经营方向：</b>面向区域与学校提供软件授权与教师服务，先打磨单一场景再扩展学科与学段。</span></li>
+          <li><span class="mark" aria-hidden="true">→</span><span><b>当前阶段：</b>公司注册、团队组建与产品原型开发并行推进中。</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="place-box">
+          <span class="label"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/></svg>占位信息 · 注册完成后替换</span>
+          <table class="compare" style="min-width:0;border:none;">
+            <tbody>
+              <tr><th scope="row" class="dim" style="background:transparent;">公司名称</th><td style="border:none;">启课科技（暂定名，待工商核定）</td></tr>
+              <tr><th scope="row" class="dim" style="background:transparent;">注册地</th><td style="border:none;">待定（规划中）</td></tr>
+              <tr><th scope="row" class="dim" style="background:transparent;">品牌 / LOGO</th><td style="border:none;">占位（本页使用临时标识）</td></tr>
+              <tr><th scope="row" class="dim" style="background:transparent;">经营范围</th><td style="border:none;">教学软件开发 · 教育内容生成服务（拟）</td></tr>
+              <tr><th scope="row" class="dim" style="background:transparent;">联系方式</th><td style="border:none;">见下方联系表单（占位）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 7. 联系 ======================= -->
+<section class="band contact-band" id="contact" aria-labelledby="contact-title">
+  <div class="container">
+    <div class="contact-grid">
+      <div>
+        <div class="section-head" style="margin-bottom:24px;">
+          <span class="label">联系我们 · 占位表单</span>
+          <h2 id="contact-title">学校、区域与伙伴，欢迎交流</h2>
+        </div>
+        <p class="lead" style="margin-bottom:32px;">公司尚在筹备阶段，本页面为品牌官网原型。若您对产品方向、试点合作或加入团队感兴趣，请填写下方表单（演示用，暂不真实发送）。</p>
+        <form class="form" id="contact-form" novalidate>
+          <div class="f-group">
+            <label for="cf-name">称呼 <span class="req" aria-hidden="true">*</span></label>
+            <input id="cf-name" name="name" type="text" autocomplete="name" required aria-describedby="name-err">
+            <span class="err-msg" id="name-err">请输入您的称呼</span>
+          </div>
+          <div class="f-group">
+            <label for="cf-org">学校 / 单位</label>
+            <input id="cf-org" name="org" type="text" autocomplete="organization">
+          </div>
+          <div class="f-group">
+            <label for="cf-email">邮箱 <span class="req" aria-hidden="true">*</span></label>
+            <input id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="email-err">
+            <span class="err-msg" id="email-err">请输入有效的邮箱地址</span>
+          </div>
+          <div class="f-group">
+            <label for="cf-msg">合作意向（试点 / 加入 / 咨询）</label>
+            <textarea id="cf-msg" name="message"></textarea>
+          </div>
+          <div>
+            <button class="btn btn-primary" id="cf-submit" type="submit" style="width:auto;">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+              提交意向（演示）
+            </button>
+          </div>
+          <p class="footnote">演示说明：这是官网原型中的示例表单，提交后仅在本页展示反馈，不会发送任何数据。正式上线后接入真实表单服务（需提供邮箱服务配置）。</p>
+          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+      <div class="contact-aside">
+        <div class="contact-card">
+          <h4><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>商务邮箱（占位）</h4>
+          <p>contact@qike-edu.example.com（示例域名，正式域名待定）</p>
+        </div>
+        <div class="contact-card">
+          <h4><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>筹备进度（示例）</h4>
+          <p>当前里程碑：公司设立方案与几何生成技术方案已完成内部规划；网站原型上线；下一步为工商注册与产品原型开发。<span class="footnote" style="display:block;margin-top:6px;">更新时间：2026-09</span></p>
+        </div>
+        <div class="contact-card">
+          <h4><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>本站属性</h4>
+          <p>本网站为筹备期品牌官网原型，单文件 HTML 交付；页面中的品牌名、LOGO、联系方式、注册信息均为占位，正式上线前统一替换。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ======================= Footer ======================= -->
+<footer class="site-footer">
+  <div class="container-wide">
+    <div class="f-grid">
+      <div>
+        <h4>启课（暂定名）</h4>
+        <ul>
+          <li>义务教育教学生成软件开发公司（筹备中）</li>
+          <li>按课标与教材版本一键生成 AI 互动课堂</li>
+          <li>技术路线对标清华大学开源 OpenMAIC</li>
+        </ul>
+      </div>
+      <div>
+        <h4>页面导航</h4>
+        <ul>
+          <li><a href="#workflow">生成流程</a></li>
+          <li><a href="#capabilities">生成能力</a></li>
+          <li><a href="#geometry-engine">几何引擎</a></li>
+          <li><a href="#benchmark">对标参考</a></li>
+          <li><a href="#company">关于公司</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>占位说明</h4>
+        <ul>
+          <li>公司名称 / LOGO / 联系方式：占位</li>
+          <li>OpenMAIC 公开数据见对标章节来源注</li>
+          <li>表单为演示，不发送真实数据</li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2026 启课（暂定名）· 筹备期官网原型 · 单文件 HTML</span>
+      <span>本页面不展示未经验证的产品指标与客户案例</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  // 内存状态 store（按沙箱运行时约束：不使用 localStorage 等持久化存储）
+  var state = { menuOpen: false, sections: [] };
+  var burger = document.getElementById('nav-burger');
+  var menu = document.getElementById('mobile-menu');
+  var body = document.body;
+
+  // ---- 移动菜单 ----
+  function setMenu(open) {
+    state.menuOpen = open;
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+    if (open) {
+      menu.hidden = false;
+      menu.classList.add('open');
+      body.classList.add('menu-locked');
+    } else {
+      menu.classList.remove('open');
+      menu.hidden = true;
+      body.classList.remove('menu-locked');
+    }
+  }
+  burger.addEventListener('click', function () {
+    setMenu(!state.menuOpen);
+    if (!state.menuOpen) burger.focus();
+  });
+  menu.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setMenu(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && state.menuOpen) {
+      setMenu(false);
+      burger.focus();
+    }
+  });
+
+  // ---- 当前章节高亮（滚动观察） ----
+  var navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  if ('IntersectionObserver' in window) {
+    var targets = [].slice.call(document.querySelectorAll('main section[id]'));
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        navLinks.forEach(function (a) {
+          a.classList.toggle('current', a.getAttribute('href') === '#' + en.target.id);
+        });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    targets.forEach(function (t) { spy.observe(t); });
+  }
+
+  // ---- 联系表单（演示） ----
+  var form = document.getElementById('contact-form');
+  var statusBox = document.getElementById('form-status');
+  var submitBtn = document.getElementById('cf-submit');
+  var nameInput = document.getElementById('cf-name');
+  var emailInput = document.getElementById('cf-email');
+
+  function setInvalid(input, invalid) {
+    var group = input.closest('.f-group');
+    if (invalid) group.classList.add('invalid'); else group.classList.remove('invalid');
+  }
+  function resetErrors() {
+    setInvalid(nameInput, false);
+    setInvalid(emailInput, false);
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (submitBtn.disabled) return;
+    resetErrors();
+    var ok = true;
+    if (!nameInput.value.trim()) { setInvalid(nameInput, true); ok = false; }
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
+    if (!emailOk) { setInvalid(emailInput, true); ok = false; }
+    if (!ok) {
+      statusBox.className = 'form-status err';
+      statusBox.textContent = '表单还有需要补充的内容，请检查红色标记字段。';
+      if (!nameInput.value.trim()) nameInput.focus(); else emailInput.focus();
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中…';
+    statusBox.className = 'form-status';
+    statusBox.textContent = '';
+    // 演示：mock 提交，1 秒后反馈成功
+    setTimeout(function () {
+      statusBox.className = 'form-status ok';
+      statusBox.textContent = '已收到您的意向（演示）。正式渠道开通后我们会提供真实提交方式。';
+      form.reset();
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>提交意向（演示）';
+    }, 1000);
+  });
+  nameInput.addEventListener('input', function () { if (nameInput.value.trim()) setInvalid(nameInput, false); });
+  emailInput.addEventListener('input', function () { if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) setInvalid(emailInput, false); });
+  nameInput.addEventListener('blur', function () { if (nameInput.value.trim()) setInvalid(nameInput, false); });
+  emailInput.addEventListener('blur', function () { if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) setInvalid(emailInput, false); });
+})();
+</script>
+</body>
+</html>
