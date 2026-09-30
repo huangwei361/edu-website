@@ -333,6 +333,54 @@ input::placeholder{color:var(--text-muted)}
 .paper .paper-empty{color:#8a93a6;font-style:italic}
 .paper .check{color:#179863;font-weight:700}
 
+/* ============ 题目讲课（类百度搜索框） ============ */
+.lecture-search-wrap{
+  padding:26px 26px 18px;
+  background:linear-gradient(180deg,#f5f9ff,#fff);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+}
+.lecture-form{max-width:880px;margin:0 auto}
+.lecture-box{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border:2px solid #d8e3f5;border-radius:999px;
+  padding:10px 10px 10px 20px;
+  box-shadow:0 6px 22px rgba(20,87,217,.08);
+  transition:border-color .2s,box-shadow .2s;
+}
+.lecture-box:focus-within{border-color:var(--action);box-shadow:0 0 0 4px rgba(20,87,217,.14),0 6px 22px rgba(20,87,217,.10)}
+.lecture-lens{width:22px;height:22px;flex:none;fill:none;stroke:var(--action);stroke-width:2;stroke-linecap:round}
+.lecture-input{
+  flex:1;min-width:0;border:none;outline:none;background:transparent;
+  font-size:17px;color:#1c2433;font-family:var(--sans);
+}
+.lecture-input::placeholder{color:#9aa7c2}
+.lecture-mic{color:var(--action);transition:color .2s}
+.lecture-mic svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lecture-mic.is-lit{color:#e1455d;background:#fdeef1;animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.lecture-go{border-radius:999px;padding:10px 22px;white-space:nowrap}
+.lecture-go svg{fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lecture-demos{
+  margin-top:14px;display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;
+  justify-content:center;
+}
+.lecture-demos-label{font-size:12.5px;color:var(--text-muted);line-height:30px}
+.lecture-chips{display:flex;gap:8px;flex-wrap:wrap}
+.lecture-chip{
+  border:1px solid #d9e4f7;background:#fff;color:#3a4b6b;
+  border-radius:999px;padding:5px 14px;font-size:12.5px;cursor:pointer;
+  transition:all .18s;
+}
+.lecture-chip:hover{border-color:var(--action);color:var(--action);background:#eef4ff}
+.lecture-input.has-value{border-color:transparent}
+@media (max-width:640px){
+  .lecture-search-wrap{padding:18px 14px 14px}
+  .lecture-box{border-radius:18px;flex-wrap:wrap;padding:8px}
+  .lecture-input{flex-basis:100%;font-size:15px;padding:4px 8px}
+  .lecture-go{flex:1;justify-content:center}
+}
+
 /* ============ 交互式模拟实验 ============ */
 .exp-card{
   background:#fff;color:#1c2433;border-radius:var(--r-lg);
@@ -586,6 +634,10 @@ input::placeholder{color:var(--text-muted)}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
       <span>工作台</span>
     </button>
+    <button class="nav-btn" data-view="lecture" title="题目讲课：像搜索一样提问，自动生成讲解 PPT 课件（支持语音）">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35M14 8v6M8 11h6"/></svg>
+      <span>题目讲课</span>
+    </button>
     <button class="nav-btn" data-view="lesson">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>
       <span>课件生成</span>
@@ -641,6 +693,11 @@ input::placeholder{color:var(--text-muted)}
       </div>
     </div>
     <div class="quick-grid" id="quick-cards">
+      <button class="quick-card" data-goto="lecture">
+        <span class="quick-ico" aria-hidden="true">💬</span>
+        <b>题目讲课</b>
+        <span>像搜索一样提问（文字/语音），自动生成讲解 PPT</span>
+      </button>
       <button class="quick-card" data-goto="lesson">
         <span class="quick-ico" aria-hidden="true">📗</span>
         <b>课件生成</b>
@@ -690,6 +747,65 @@ input::placeholder{color:var(--text-muted)}
       <ul class="history-list" id="history-list">
         <li class="empty-hint">还没有生成记录。去上面挑一个模块，开始您的第一份课堂成果吧！</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- ============ 题目讲课（类百度搜索框） ============ -->
+  <section class="view" id="view-lecture" hidden aria-labelledby="lecture-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">题目讲课</p>
+        <h2 id="lecture-title">学生来问，AI 来讲</h2>
+        <p class="view-desc">像用搜索引擎一样输入问题或题目内容（支持语音），覆盖小学一年级到高中三年级全部学段学科：自动识别学段、学科与题型，几秒钟生成带讲解、可演示、可导出的 PPT 课件。</p>
+      </div>
+    </div>
+
+    <!-- 类百度大搜索框 -->
+    <div class="lecture-search-wrap panel">
+      <form class="lecture-form" id="lecture-form" role="search" aria-label="题目讲课搜索">
+        <div class="lecture-box">
+          <svg class="lecture-lens" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input class="lecture-input" id="lecture-q" type="search" placeholder="输入或说出你的问题 / 题目内容，如：为什么三角形内角和是 180°？" autocomplete="off" enterkeyhint="search">
+          <button class="lecture-mic icon-btn" id="lecture-voice" type="button" title="语音输入问题" aria-label="语音输入问题">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 19v3M8 22h8"/></svg>
+          </button>
+          <button class="btn btn-primary lecture-go" id="lecture-go" type="submit">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            生成讲解
+          </button>
+        </div>
+      </form>
+      <div class="lecture-demos">
+        <span class="lecture-demos-label">试试这样问：</span>
+        <div class="lecture-chips" id="lecture-demos"></div>
+      </div>
+    </div>
+
+    <!-- 讲解结果 -->
+    <div class="result-wrap" id="lecture-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title" id="lecture-result-title">讲解课件</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="lecture-print" title="在浏览器中排版并导出为 PDF">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            打印/导出
+          </button>
+          <button class="btn btn-ghost" id="lecture-export-pptx" title="导出为可逐元素编辑的 PPTX（每环节一页）">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 8l4 7 4-7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出 PPTX
+          </button>
+          <button class="btn btn-ghost" id="lecture-export-html" title="导出为自包含交互式 HTML（可离线打开）">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v5h5"/><path d="M14 3l6 6v12H4V3h10z"/><path d="M9 12l-2 2 2 2M13 12l2 2-2 2" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出 HTML
+          </button>
+          <button class="btn btn-primary" id="lecture-slides" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="11" rx="2"/><path d="M8 21h8m-4-6v6"/></svg>
+            🎞 幻灯片讲课
+          </button>
+        </div>
+      </div>
+      <div class="paper" id="lecture-paper"></div>
+      <div class="sp-player" id="lecture-player" hidden aria-live="polite"></div>
     </div>
   </section>
 
@@ -2123,7 +2239,100 @@ window.QIKE_DATA = (function () {
   // 关键词批改用的停用词（判分时过滤）
   const stopWords = ["的", "了", "是", "我", "你", "他", "她", "它", "们", "和", "与", "在", "对", "有", "一个", "一下", "很", "就", "都", "也", "还", "吗", "呢", "吧", "啊", "请问", "什么", "怎么"];
 
-  return { pedagogy, subjects, materialize, classroom, quizBank, quizFor, experiments, pbl, stopWords };
+  /* ============================================================
+   * v3 · 题目讲课：识别词库与讲解模板
+   * 支持 1–12 年级学生提问/题目 → 自动识别学段、学科、题型并生成讲解
+   * ============================================================ */
+  const lectureHints = {
+    // 学科强关键词（命中计分，多字词权重更高；覆盖小初高全部学科）
+    subjects: {
+      "数学": ["加减法", "乘除法", "计算", "方程", "不等式", "分数", "小数", "百分数", "比例", "面积", "周长", "体积", "几何", "图形", "三角形", "长方形", "正方形", "圆", "函数", "应用题", "角度", "单位换算", "口算", "笔算", "估算", "数学", "公式", "定理", "内角和", "勾股"],
+      "语文": ["课文", "古诗", "作文", "阅读", "阅读理解", "拼音", "生字", "词语", "成语", "修辞", "比喻", "拟人", "排比", "句子", "段落", "标点", "朗读", "书写", "文言文", "现代文", "中心思想", "语文", "背诵", "默写", "偏旁", "笔画"],
+      "英语": ["单词", "词汇", "语法", "时态", "句型", "句子", "英语", "翻译", "听力", "口语", "字母", "音标", "阅读理解", "英语作文", "一般现在时", "过去时", "现在进行时", "将来时", "比较级", "最高级"],
+      "物理": ["物理", "力", "重力", "浮力", "压强", "速度", "加速度", "运动", "牛顿", "电路", "电流", "电压", "电阻", "电功率", "功率", "功", "能量", "光", "透镜", "折射", "反射", "密度", "惯性", "摩擦力", "杠杆", "机械效率", "内能", "比热容"],
+      "化学": ["化学", "元素", "分子", "原子", "化学式", "化学方程式", "反应", "溶液", "酸", "碱", "盐", "氧化物", "氧气", "氢气", "燃烧", "质量守恒", "化合价", "金属", "非金属", "催化剂", "溶解度"],
+      "生物学": ["生物", "细胞", "光合作用", "呼吸作用", "遗传", "基因", "生态", "种群", "群落", "器官", "组织", "细菌", "病毒", "免疫", "神经", "血液", "消化", "进化", "DNA", "染色体", "叶绿体"],
+      "历史": ["历史", "朝代", "古代", "近代", "现代", "皇帝", "战争", "革命", "变法", "条约", "文明", "统一", "分裂", "文物", "考古", "春秋", "战国", "秦汉", "唐", "宋", "元明", "清朝"],
+      "地理": ["地理", "地图", "气候", "经纬度", "经度", "纬度", "地球", "自转", "公转", "洋流", "板块", "地形", "河流", "湖泊", "人口", "城市", "山脉", "平原", "高原", "盆地", "季风", "时区"],
+      "道德与法治": ["道德", "法律", "规则", "权利", "义务", "宪法", "责任", "诚信", "安全", "公共", "法治", "礼仪", "规则意识", "社会主义核心价值观"],
+      "科学": ["科学", "实验", "观察", "磁铁", "声音", "水", "空气", "天气", "太阳", "月亮", "星星", "植物", "动物", "影子", "测量", "温度", "溶解", "浮沉"],
+      "思想政治": ["哲学", "政治", "经济", "文化", "社会", "矛盾", "实践", "认识", "规律", "价值", "革命", "改革", "辩证", "生产力", "生产关系", "物质与意识"],
+    },
+    // 题型映射（识别后使用对应讲解话术）
+    types: {
+      concept: { name: "概念理解", kws: ["什么是", "是什么", "含义", "定义", "概念", "解释", "区别", "相同点", "不同点", "说说", "讲讲"] },
+      calc: { name: "计算求解", kws: ["计算", "求值", "化简", "得数", "等于多少", "算一算", "口算", "笔算", "运算", "解方程", "求x", "求解", "求面积", "求周长", "怎么算", "多少"] },
+      word: { name: "应用解决", kws: ["应用题", "多少元", "买了", "走了", "一共", "还剩", "速度", "路程", "时间", "相遇", "单价", "总价", "比一比", "倍"] },
+      proof: { name: "证明推理", kws: ["证明", "求证", "说明理由", "推理", "归纳", "猜想", "验证", "为什么", "依据"] },
+      reading: { name: "阅读赏析", kws: ["阅读", "文章", "短文", "理解", "赏析", "中心思想", "概括", "段落", "句子的含义", "表达作用"] },
+      writing: { name: "写作表达", kws: ["作文", "写一", "习作", "小练笔", "日记", "续写", "看图写话", "描写"] },
+      memory: { name: "记忆背诵", kws: ["背诵", "默写", "记住", "背一背", "积累", "识记"] },
+      exp: { name: "实验探究", kws: ["实验", "探究", "观察", "假设", "对照", "得出结论", "变量", "器材"] },
+    },
+    // 讲解话术（按题型）：{Q}题目、{S}学科、{K}主题
+    steps: {
+      concept: [
+        "先抓住关键词“{K}”，回忆它在课本中的定义与典型例子。",
+        "把抽象概念拆成“是什么 — 为什么 — 怎么用”三步，逐层理解。",
+        "结合题目“{Q}”中的情形，试着用自己的话判断、举例或说明。",
+        "最后复述一遍自己的理解，并与标准表述对照，看看有没有遗漏关键点。",
+      ],
+      calc: [
+        "通读题目“{Q}”，圈出数字、运算符号与单位，明确题目要求什么。",
+        "回忆相关运算法则：运算顺序、公式与性质，确定解题路径。",
+        "按步骤列式计算：先算…再算…，每一步都写清依据，不跳步。",
+        "检查验算：把结果代回原题看是否成立，并核对单位与数值范围。",
+      ],
+      word: [
+        "理解情境：把题目“{Q}”中的生活信息翻译成数量关系。",
+        "找出已知量与未知量，必要时画线段图或列表，理清数量关系。",
+        "选择方法（如归一问题、总价问题、速度×时间），列式求解。",
+        "作答并检查：单位、答语写完整，结果要符合生活实际。",
+      ],
+      proof: [
+        "明确结论：先看清要证明或求解的结论“{Q}”，用符号或图形表示出来。",
+        "回忆相关定理、性质与判定方法（如全等、角的关系、函数性质）。",
+        "从已知条件出发逐步推导，每一步都要有依据（已知、定义、定理）。",
+        "整理证明过程，检查逻辑链是否完整，结论是否真的由条件推出。",
+      ],
+      reading: [
+        "通读文章“{Q}”，标出人物、事件、时间与关键词句。",
+        "分析文章结构：开头—发展—高潮—结尾，抓住中心句或主旨。",
+        "结合上下文理解重点词句的含义与表达作用，关注修辞与细节。",
+        "组织语言作答：先总后分、紧扣原文，表达完整、条理清楚。",
+      ],
+      writing: [
+        "审清题意：明确“{Q}”要求的主题、文体与字数范围。",
+        "搭框架：开头（引入）— 主体（分 2–3 个要点）— 结尾（点题）。",
+        "补充细节：用具体的动作、对话、事例把内容写丰满、写生动。",
+        "修改润色：检查错别字、标点与语句通顺，确保突出主题。",
+      ],
+      memory: [
+        "先理解再记忆：读懂“{Q}”的含义与条理，而不是死记硬背。",
+        "寻找记忆线索：关键词、韵脚、画面、口诀，把内容串成链。",
+        "分段背诵：把内容拆成小段，逐段过关后再整体串联。",
+        "及时复习：按遗忘规律在当晚、次日、一周后各复习一次巩固。",
+      ],
+      exp: [
+        "明确问题与假设：研究“{Q}”要解决什么问题，先提出合理猜想。",
+        "设计实验：控制变量，设置实验组与对照组，选好器材。",
+        "操作并记录：按步骤观察、测量、记录数据，实事求是。",
+        "分析并下结论：从数据中找规律，检验假设，并反思不足与改进。",
+      ],
+    },
+    tips: {
+      concept: ["概念混淆：相近概念要对比记忆，找出关键区别。", "死记硬背：理解后用生活中的例子举例，才算真正掌握。"],
+      calc: ["运算顺序错误：先乘除后加减，有括号先算括号里。", "单位与符号：结果记得带单位，负号、小数点不要丢。"],
+      word: ["审题不清：漏看条件会出错，先圈出数字关键词。", "答语不完整：列式正确但没写单位和答语，仍会失分。"],
+      proof: ["依据不明：每一步推导都要注明定理或已知条件。", "逻辑跳步：宁可多写一步，也不要想当然地“显然”。"],
+      reading: ["答非所问：从原文中找依据，紧扣题目要求作答。", "概括不全：先总后分，点明事件、情感与主旨。"],
+      writing: ["跑题：开头先点题，每一段都围绕中心展开。", "内容空洞：用具体事例和细节撑起字数，避免空话套话。"],
+      memory: ["死记硬背：理解了再背，效果翻倍。", "一背了之：要按遗忘规律及时复习，否则很快忘掉。"],
+      exp: ["无关变量没控制：只改变一个变量，其它条件保持相同。", "结论不严谨：用多组数据验证后再下结论。"],
+    },
+  };
+
+  return { pedagogy, subjects, materialize, classroom, quizBank, quizFor, experiments, pbl, lectureHints, stopWords };
 })();
 /* ===== app-engine.js ===== */
 /* ============================================================
@@ -2588,6 +2797,152 @@ window.QIKE_ENGINE = (function () {
   }
 
   /* =================================================
+   * v3 · 学生题目讲课（类百度搜索框：文字/语音提问 → 自动讲解）
+   * 覆盖 1–12 年级，识别学段/学科/题型后生成本地讲解课件
+   * ================================================= */
+  function makeLecture(text, opts) {
+    const raw = String(text || "").trim();
+    if (!raw) return null;
+    const H = DATA.lectureHints;
+    const subject = (opts && opts.subject) || detectSubject(raw);
+    const grade = detectGrade(raw);
+    const stage = classifyStage(grade);
+    const typeKey = (opts && opts.typeKey) || detectType(raw);
+    const typeName = H.types[typeKey] ? H.types[typeKey].name : "综合讲解";
+    const topic = guessTopic(raw, subject);
+    const m = material(subject);
+
+    // 讲解内容
+    const fill = (tpl) => tpl.replace(/\{Q\}/g, raw).replace(/\{S\}/g, subject).replace(/\{K\}/g, topic);
+    const steps = (H.steps[typeKey] || H.steps.concept).map(fill);
+    const tips = H.tips[typeKey] || H.tips.concept;
+    const concepts = (m.concepts || []).slice(0, 2);
+    const practices = (m.practices || []).slice(0, 2);
+    const analysis = buildAnalysis(raw, subject, topic);
+
+    const objectives = [
+      { key: "知识", text: `理解“${topic}”的核心要点，掌握与之相关的${subject}基本概念与规范表达。` },
+      { key: "能力", text: `能独立分析题意、梳理条件与问题，并按照清晰步骤完成同类题目。` },
+      { key: "素养", text: "经历“审题—拆解—作答—检查”完整过程，发展逻辑推理与自我监控意识。" },
+      { key: "情感", text: "敢于提问、乐于追问，在把问题讲清楚的过程中建立学习信心。" },
+    ];
+
+    const sections = [
+      { t: "原题呈现", head: "题目内容", body: [raw] },
+      { t: "题意分析", head: "审题要点", body: analysis },
+      { t: "核心知识", head: `“${topic}”知识联系`, body: concepts.length ? concepts : [m.examPoints && m.examPoints[0] || "核心概念"] },
+      { t: "解题思路", head: "分步讲解", body: steps },
+      { t: "易错提醒", head: "常踩的坑", body: tips },
+      { t: "课堂练习", head: "同类巩固", body: practices.length ? practices : ["换一组数字，按同样的思路再做一遍。"] },
+      { t: "课堂小结", head: "这节课学会了", body: [`能读懂并复述“${topic}”类问题，说出解题三步骤；`, "遇到不会的题不慌张：先圈条件、再想方法、最后检查。", `若还有疑问，把卡住的那一步说清楚，再生成一次讲解。`] },
+    ];
+
+    // 幻灯片（每环节一至两页，适配 mountSlides 播放器与 PPTX/HTML 导出）
+    const S = [];
+    S.push({ page: 1, kicker: "题目讲课", title: topic, sub: `${subject} · ${stage.label} · ${typeName}（学生提问）`, bullets: ["来自学生的问题：", raw, `${stage.label} · ${subject} · ${typeName} · 本地引擎即时生成`] });
+    S.push({ page: 2, kicker: "原题呈现", title: "题目内容", bullets: [raw] });
+    S.push({ page: 3, kicker: "题意分析", title: "审题要点", bullets: analysis });
+    if (concepts.length) S.push({ page: 4, kicker: "核心知识", title: "知识联系", bullets: concepts });
+    const stepPages = Math.ceil(steps.length / 2);
+    steps.forEach((st, i) => {
+      const pi = 4 + (concepts.length ? 1 : 0) + Math.floor(i / 2);
+      const existing = S[pi] || (S[pi] = { page: pi, kicker: "解题思路", title: "分步讲解 " + (Math.floor(i / 2) + 1), bullets: [] });
+      existing.bullets.push(st);
+    });
+    const base = 4 + (concepts.length ? 1 : 0) + stepPages;
+    S.push({ page: base, kicker: "易错提醒", title: "常踩的坑", bullets: tips });
+    S.push({ page: base + 1, kicker: "课堂练习", title: "同类巩固", bullets: practices.length ? practices : ["换一组数字，按同样的思路再做一遍。"] });
+    S.push({ page: base + 2, kicker: "课堂小结", title: "这节课学会了", bullets: ["能读懂并复述这类问题，说出解题三步骤", "先圈条件 → 再想方法 → 最后检查", "把卡住的那一步说清楚，再生成一次讲解"] });
+    const slides = S.filter(Boolean);
+
+    return {
+      kind: "lecture",
+      meta: { stage: stage.label, grade, subject, version: "学生提问", chapter: subject + " · 题目讲解", topic, engine: "local" },
+      title: "讲解 · " + topic,
+      subtitle: `${subject} · ${stage.label} · ${typeName} · 学生提问即时生成`,
+      objectives,
+      sections,
+      slides,
+      detected: { grade, stage: stage.id, stageLabel: stage.label, subject, typeKey, typeName, topic, score: detectSubjectScore(raw) },
+    };
+  }
+  function detectSubject(raw) {
+    const H = DATA.lectureHints;
+    let best = "", bestScore = 0;
+    Object.keys(H.subjects).forEach((sub) => {
+      let score = 0;
+      H.subjects[sub].forEach((w) => { if (raw.indexOf(w) >= 0) score += w.length >= 3 ? 2 : 1; });
+      if (score > bestScore) { bestScore = score; best = sub; }
+    });
+    if (best) return best;
+    if (/[a-zA-Z]/.test(raw)) return "英语";
+    if (/(背诵|默写|古诗|课文|作文|拼音|阅读理解|修辞)/.test(raw)) return "语文";
+    return "数学";
+  }
+  function detectSubjectScore(raw) {
+    const H = DATA.lectureHints;
+    let best = 0;
+    Object.keys(H.subjects).forEach((sub) => {
+      let score = 0;
+      H.subjects[sub].forEach((w) => { if (raw.indexOf(w) >= 0) score += w.length >= 3 ? 2 : 1; });
+      if (score > best) best = score;
+    });
+    return best;
+  }
+  function detectGrade(raw) {
+    const cnMap = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10, "十一": 11, "十二": 12 };
+    const g1 = raw.match(/([0-9]{1,2})\s*年级/);
+    if (g1) return Math.min(12, Math.max(1, parseInt(g1[1], 10)));
+    const g2 = raw.match(/([一二三四五六七八九十]{1,2})\s*年级/);
+    if (g2) { const v = cnMap[g2[1]]; if (v) return v; }
+    if (/初[一二三]|七[一二三]?年级/.test(raw)) return raw.indexOf("初三") >= 0 || raw.indexOf("九年级") >= 0 ? 9 : (raw.indexOf("初二") >= 0 || raw.indexOf("八年级") >= 0 ? 8 : 7);
+    if (/(高一|十年级)/.test(raw)) return 10;
+    if (/(高二|十一年级)/.test(raw)) return 11;
+    if (/(高三|十二年级)/.test(raw)) return 12;
+    if (raw.indexOf("初中") >= 0) return 8;
+    if (raw.indexOf("高中") >= 0) return 11;
+    if (raw.indexOf("物理") >= 0 || raw.indexOf("化学") >= 0) return 9;
+    if (/(导数|圆锥曲线|数列|向量|电磁感应|有机化学|遗传|哲学)/.test(raw)) return 11;
+    return 4; // 未指明年级：默认小学中期通学段
+  }
+  function classifyStage(grade) {
+    if (grade >= 10) return { id: "senior", label: "高中" };
+    if (grade >= 7) return { id: "junior", label: "初中" };
+    return { id: "primary", label: "小学" };
+  }
+  function detectType(raw) {
+    const H = DATA.lectureHints;
+    let best = "concept", bestScore = 0;
+    Object.keys(H.types).forEach((tk) => {
+      let score = 0;
+      H.types[tk].kws.forEach((w) => { if (raw.indexOf(w) >= 0) score += 1; });
+      if (score > bestScore) { bestScore = score; best = tk; }
+    });
+    return best;
+  }
+  function guessTopic(raw, subject) {
+    const m = material(subject);
+    const pool = (m.concepts || []).concat(m.examPoints || []);
+    let hit = "";
+    pool.forEach((c) => { if (c && c.length > 1 && raw.indexOf(c) >= 0 && c.length > hit.length) hit = c; });
+    if (hit) return hit;
+    const cleaned = raw
+      .replace(/^(请|帮|麻烦|请问|给我|让我)/, "")
+      .replace(/^(什么是|为什么|怎么|如何|怎样|讲讲|讲一下|解释一下)/, "")
+      .replace(/[？?。！!，,：:；;、]/g, "");
+    return (cleaned.slice(0, 12) || "这道题");
+  }
+  function buildAnalysis(raw, subject, topic) {
+    const nums = raw.match(/\d+(?:\.\d+)?/g) || [];
+    const lines = [
+      `先读两遍题目，圈出关键词“${topic}”与条件数据${nums.length ? "（本题出现数字：" + nums.slice(0, 4).join("、") + "）" : ""}。`,
+      `明确要求：题目让我们${raw.indexOf("为什么") >= 0 || raw.indexOf("证明") >= 0 || raw.indexOf("依据") >= 0 ? "说明道理/推理依据" : (raw.indexOf("计算") >= 0 || /[＝=]/.test(raw) ? "算出结果" : "理解并作答")}。`,
+      `把它拆成“已知什么 → 求什么 → 用什么方法”三步，再调用${subject}里的知识来解决。`,
+    ];
+    return lines;
+  }
+
+  /* =================================================
    * v2 · 随堂测验（可实时批改：标准答案 + 解析）
    * ================================================= */
   function makeQuiz(subject, topic, count) {
@@ -2798,6 +3153,7 @@ window.QIKE_ENGINE = (function () {
     generateLesson, generateInteractive, generateHomework, generateGeometry,
     makeSlides, makeClassroom, makeQuiz, gradeKeyword, classroomReport,
     makePBL, makeExperiment, runExperiment,
+    makeLecture,
     callApi, material, dist, angleDeg,
     vertexLabel: (n) => String(n),
     exportMarkdown: renderMarkdown,
@@ -3695,6 +4051,9 @@ window.QIKE_EXPORT = (function () {
   function toSlides(art) {
     if (!art) return [];
     const meta = art.meta || {};
+    if (art.kind === "lecture") {
+      return (art.slides || []).map((s) => ({ kicker: s.kicker, title: s.title, sub: s.sub, bullets: s.bullets }));
+    }
     if (art.kind === "lesson") {
       const deck = ENGINE.makeSlides(art);
       return (deck && deck.slides ? deck.slides : []);
@@ -4172,7 +4531,7 @@ window.QIKE_UI = (function () {
     if (!win) { warn("浏览器拦截了打印窗口，请允许弹出窗口后重试。"); return; }
     let body = "";
     const container = document.createElement("div");
-    if (art.kind === "lesson") renderLesson(art, container);
+    if (art.kind === "lesson" || art.kind === "lecture") renderLesson(art, container);
     else if (art.kind === "interactive") renderInteractive(art, container);
     else if (art.kind === "homework") renderHomework(art, container);
     const css = `body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:#1c2433;margin:34px;line-height:1.75}
@@ -5143,7 +5502,7 @@ window.QIKE_UI = (function () {
       return;
     }
     clearBtn.hidden = false;
-    const ico = { lesson: "📗", interactive: "🎯", homework: "📝", geometry: "📐", slides: "🎞️", classroom: "🧑‍🏫", experiment: "⚗️", pbl: "🧩" };
+    const ico = { lesson: "📗", interactive: "🎯", homework: "📝", geometry: "📐", slides: "🎞️", classroom: "🧑‍🏫", experiment: "⚗️", pbl: "🧩", lecture: "💬" };
     state.history.forEach((h) => {
       const li = document.createElement("li");
       li.innerHTML = `
@@ -5164,7 +5523,7 @@ window.QIKE_UI = (function () {
   function openHistory(id) {
     const h = state.history.find((x) => x.id === id);
     if (!h) return;
-    const viewMap = { lesson: "lesson", interactive: "interactive", homework: "homework", geometry: "geometry", slides: "classroom", classroom: "classroom", experiment: "experiment", pbl: "pbl" };
+    const viewMap = { lesson: "lesson", interactive: "interactive", homework: "homework", geometry: "geometry", slides: "classroom", classroom: "classroom", experiment: "experiment", pbl: "pbl", lecture: "lecture" };
     const view = viewMap[h.kind];
     if (!view) return;
     switchView(view);
@@ -5218,6 +5577,11 @@ window.QIKE_UI = (function () {
       $("lesson-result").hidden = false;
       $("lesson-result-title").textContent = art.title;
       $("lesson-slides").hidden = false;
+    } else if (art.kind === "lecture") {
+      U.renderLesson(art, $("lecture-paper"));
+      $("lecture-result").hidden = false;
+      $("lecture-result-title").textContent = art.title;
+      $("lecture-slides").hidden = false;
     } else if (art.kind === "interactive") {
       U.renderInteractive(art, $("interactive-paper"));
       $("interactive-result").hidden = false;
@@ -5363,6 +5727,112 @@ window.QIKE_UI = (function () {
       $("lesson-slides").classList.add("is-lit");
       box.scrollIntoView({ behavior: "smooth", block: "nearest" });
       U.success("已就绪：共 " + deck.count + " 页，可自动放映、跟读讲解或逐页播放。");
+    });
+  }
+
+  /* ---------- 题目讲课（类百度搜索框：文字/语音提问 → 自动讲解课件） ---------- */
+  function initLecture() {
+    const form = $("lecture-form");
+    const input = $("lecture-q");
+    const goBtn = $("lecture-go");
+    const voiceBtn = $("lecture-voice");
+    const demoBox = $("lecture-demos");
+    let player = null;
+
+    function clearPlayer() {
+      if (player) { player.destroy(); player = null; }
+      $("lecture-player").hidden = true;
+      $("lecture-slides").classList.remove("is-lit");
+    }
+    function run(q) {
+      const text = String(q == null ? input.value : q).trim();
+      if (!text) { U.warn("请先输入或说出你的问题或题目内容。"); input.focus(); return; }
+      goBtn.disabled = true; goBtn.textContent = "识别生成中…";
+      setTimeout(() => {
+        const art = E.makeLecture(text);
+        goBtn.disabled = false; goBtn.textContent = "生成讲解";
+        if (!art) { U.warn("没能生成讲解课件，请换一种说法试试。"); return; }
+        clearPlayer();           // 切换新题目时回收旧播放器
+        renderArtifact(art);
+        addHistory(art);
+        saveRecent(art);
+        const d = art.detected;
+        U.success("已识别：" + d.subject + " · " + d.stageLabel + (d.grade && d.grade > 0 ? "（约" + d.grade + "年级）" : "") + " · " + d.typeName + "，共 " + art.slides.length + " 页课件。");
+        input.classList.add("has-value");
+      }, 70);
+    }
+    // 提交
+    form.addEventListener("submit", (e) => { e.preventDefault(); run(); });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(); } });
+    // 语音输入（类百度搜索框的麦克风）
+    voiceBtn.addEventListener("click", () => {
+      const V = window.QIKE_VOICE;
+      if (!V || !V.listen) { U.warn("当前浏览器不支持语音识别，请直接用文字输入。"); return; }
+      const lit = voiceBtn.classList.toggle("is-lit");
+      if (!lit) { clearPlayer(); return; }      // 再点一次取消聆听
+      voiceBtn.disabled = true;
+      V.listen((ok, text, err) => {
+        voiceBtn.disabled = false; voiceBtn.classList.remove("is-lit");
+        if (!ok || !text) { U.warn(err || "没有听清，请重试或改用文字输入。"); return; }
+        input.value = text;
+        run();
+      });
+    });
+    // 示例问题（快速体验 1–12 年级各学段学科）
+    const demos = [
+      { label: "三年级 · 分数加减法", q: "三年级 分数加减法怎么算？比如 1/4 + 2/4 等于多少？" },
+      { label: "初一 · 一元一次方程", q: "初一 解方程：3x + 5 = 20，x 等于多少？" },
+      { label: "初二 · 勾股定理", q: "初二 直角三角形两条直角边是 3 和 4，斜边为什么等于 5？" },
+      { label: "五年级 · 圆的面积", q: "五年级 为什么圆的面积等于 πr²？" },
+      { label: "高一 · 函数定义", q: "高一 什么是函数？为什么 y = 2x + 1 是函数？" },
+      { label: "高三 · 导数几何意义", q: "高三 导数的几何意义是什么？怎么求切线方程？" },
+      { label: "小学 · 古诗背诵", q: "小学 古诗《静夜思》怎么背诵记忆？" },
+      { label: "初三 · 化学方程式", q: "初三 化学方程式配平怎么做？" },
+      { label: "六年级 · 阅读理解", q: "六年级 语文阅读理解怎么概括中心思想？" },
+      { label: "高二 · 英语语法", q: "高二 英语一般过去时和现在完成时有什么区别？" },
+    ];
+    demos.forEach((d) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "lecture-chip";
+      chip.textContent = d.label;
+      chip.title = d.q;
+      chip.addEventListener("click", () => { input.value = d.q; run(); });
+      demoBox.appendChild(chip);
+    });
+    // 结果区：打印 / 导出 / 幻灯片
+    $("lecture-print").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再导出文件。"); return; }
+      U.printArt(art, "题目讲解课件");
+    });
+    $("lecture-export-pptx").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再导出文件。"); return; }
+      const r = window.QIKE_EXPORT.exportPPTX(art, "qike-lecture-" + window.QIKE_EXPORT.safeName(art.title) + ".pptx");
+      U.success(r.ok ? "PPTX 已导出：" + r.slides + " 页（可逐元素编辑）" : "导出失败：" + r.reason);
+    });
+    $("lecture-export-html").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再导出文件。"); return; }
+      const r = window.QIKE_EXPORT.exportHTML(art, "qike-lecture-" + window.QIKE_EXPORT.safeName(art.title) + "-interactive.html", {});
+      U.success(r.ok ? "交互式 HTML 已导出，可离线打开" : "导出失败");
+    });
+    $("lecture-slides").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再进入幻灯片讲课。"); return; }
+      if (player) { clearPlayer(); return; }
+      if (!art.slides || !art.slides.length) { U.warn("这份讲解没有可用的幻灯片结构，无法讲课。"); return; }
+      const box = $("lecture-player");
+      box.hidden = false;
+      player = U.mountSlides(art.slides, box, { spotlight: true, laser: true });
+      $("lecture-slides").classList.add("is-lit");
+      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      U.success("已就绪：共 " + art.slides.length + " 页，可自动放映、跟读讲解或逐页播放。");
+    });
+    // 快捷引导：把搜索框放回页面顶部
+    $("lecture-backtop") && $("lecture-backtop").addEventListener("click", () => {
+      $("view-lecture").scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -6056,7 +6526,7 @@ window.QIKE_UI = (function () {
   }
 
   function init() {
-    initLesson(); initInteractive(); initClassroom(); initHomework(); initGeometry(); initExperiment(); initPBL(); initSearch();
+    initLesson(); initLecture(); initInteractive(); initClassroom(); initHomework(); initGeometry(); initExperiment(); initPBL(); initSearch();
     initSettings(); initMobileNav(); initQuickCards();
     // 导航
     document.querySelectorAll(".nav-btn").forEach((b) => {

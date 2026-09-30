@@ -460,6 +460,152 @@ window.QIKE_ENGINE = (function () {
   }
 
   /* =================================================
+   * v3 · 学生题目讲课（类百度搜索框：文字/语音提问 → 自动讲解）
+   * 覆盖 1–12 年级，识别学段/学科/题型后生成本地讲解课件
+   * ================================================= */
+  function makeLecture(text, opts) {
+    const raw = String(text || "").trim();
+    if (!raw) return null;
+    const H = DATA.lectureHints;
+    const subject = (opts && opts.subject) || detectSubject(raw);
+    const grade = detectGrade(raw);
+    const stage = classifyStage(grade);
+    const typeKey = (opts && opts.typeKey) || detectType(raw);
+    const typeName = H.types[typeKey] ? H.types[typeKey].name : "综合讲解";
+    const topic = guessTopic(raw, subject);
+    const m = material(subject);
+
+    // 讲解内容
+    const fill = (tpl) => tpl.replace(/\{Q\}/g, raw).replace(/\{S\}/g, subject).replace(/\{K\}/g, topic);
+    const steps = (H.steps[typeKey] || H.steps.concept).map(fill);
+    const tips = H.tips[typeKey] || H.tips.concept;
+    const concepts = (m.concepts || []).slice(0, 2);
+    const practices = (m.practices || []).slice(0, 2);
+    const analysis = buildAnalysis(raw, subject, topic);
+
+    const objectives = [
+      { key: "知识", text: `理解“${topic}”的核心要点，掌握与之相关的${subject}基本概念与规范表达。` },
+      { key: "能力", text: `能独立分析题意、梳理条件与问题，并按照清晰步骤完成同类题目。` },
+      { key: "素养", text: "经历“审题—拆解—作答—检查”完整过程，发展逻辑推理与自我监控意识。" },
+      { key: "情感", text: "敢于提问、乐于追问，在把问题讲清楚的过程中建立学习信心。" },
+    ];
+
+    const sections = [
+      { t: "原题呈现", head: "题目内容", body: [raw] },
+      { t: "题意分析", head: "审题要点", body: analysis },
+      { t: "核心知识", head: `“${topic}”知识联系`, body: concepts.length ? concepts : [m.examPoints && m.examPoints[0] || "核心概念"] },
+      { t: "解题思路", head: "分步讲解", body: steps },
+      { t: "易错提醒", head: "常踩的坑", body: tips },
+      { t: "课堂练习", head: "同类巩固", body: practices.length ? practices : ["换一组数字，按同样的思路再做一遍。"] },
+      { t: "课堂小结", head: "这节课学会了", body: [`能读懂并复述“${topic}”类问题，说出解题三步骤；`, "遇到不会的题不慌张：先圈条件、再想方法、最后检查。", `若还有疑问，把卡住的那一步说清楚，再生成一次讲解。`] },
+    ];
+
+    // 幻灯片（每环节一至两页，适配 mountSlides 播放器与 PPTX/HTML 导出）
+    const S = [];
+    S.push({ page: 1, kicker: "题目讲课", title: topic, sub: `${subject} · ${stage.label} · ${typeName}（学生提问）`, bullets: ["来自学生的问题：", raw, `${stage.label} · ${subject} · ${typeName} · 本地引擎即时生成`] });
+    S.push({ page: 2, kicker: "原题呈现", title: "题目内容", bullets: [raw] });
+    S.push({ page: 3, kicker: "题意分析", title: "审题要点", bullets: analysis });
+    if (concepts.length) S.push({ page: 4, kicker: "核心知识", title: "知识联系", bullets: concepts });
+    const stepPages = Math.ceil(steps.length / 2);
+    steps.forEach((st, i) => {
+      const pi = 4 + (concepts.length ? 1 : 0) + Math.floor(i / 2);
+      const existing = S[pi] || (S[pi] = { page: pi, kicker: "解题思路", title: "分步讲解 " + (Math.floor(i / 2) + 1), bullets: [] });
+      existing.bullets.push(st);
+    });
+    const base = 4 + (concepts.length ? 1 : 0) + stepPages;
+    S.push({ page: base, kicker: "易错提醒", title: "常踩的坑", bullets: tips });
+    S.push({ page: base + 1, kicker: "课堂练习", title: "同类巩固", bullets: practices.length ? practices : ["换一组数字，按同样的思路再做一遍。"] });
+    S.push({ page: base + 2, kicker: "课堂小结", title: "这节课学会了", bullets: ["能读懂并复述这类问题，说出解题三步骤", "先圈条件 → 再想方法 → 最后检查", "把卡住的那一步说清楚，再生成一次讲解"] });
+    const slides = S.filter(Boolean);
+
+    return {
+      kind: "lecture",
+      meta: { stage: stage.label, grade, subject, version: "学生提问", chapter: subject + " · 题目讲解", topic, engine: "local" },
+      title: "讲解 · " + topic,
+      subtitle: `${subject} · ${stage.label} · ${typeName} · 学生提问即时生成`,
+      objectives,
+      sections,
+      slides,
+      detected: { grade, stage: stage.id, stageLabel: stage.label, subject, typeKey, typeName, topic, score: detectSubjectScore(raw) },
+    };
+  }
+  function detectSubject(raw) {
+    const H = DATA.lectureHints;
+    let best = "", bestScore = 0;
+    Object.keys(H.subjects).forEach((sub) => {
+      let score = 0;
+      H.subjects[sub].forEach((w) => { if (raw.indexOf(w) >= 0) score += w.length >= 3 ? 2 : 1; });
+      if (score > bestScore) { bestScore = score; best = sub; }
+    });
+    if (best) return best;
+    if (/[a-zA-Z]/.test(raw)) return "英语";
+    if (/(背诵|默写|古诗|课文|作文|拼音|阅读理解|修辞)/.test(raw)) return "语文";
+    return "数学";
+  }
+  function detectSubjectScore(raw) {
+    const H = DATA.lectureHints;
+    let best = 0;
+    Object.keys(H.subjects).forEach((sub) => {
+      let score = 0;
+      H.subjects[sub].forEach((w) => { if (raw.indexOf(w) >= 0) score += w.length >= 3 ? 2 : 1; });
+      if (score > best) best = score;
+    });
+    return best;
+  }
+  function detectGrade(raw) {
+    const cnMap = { "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10, "十一": 11, "十二": 12 };
+    const g1 = raw.match(/([0-9]{1,2})\s*年级/);
+    if (g1) return Math.min(12, Math.max(1, parseInt(g1[1], 10)));
+    const g2 = raw.match(/([一二三四五六七八九十]{1,2})\s*年级/);
+    if (g2) { const v = cnMap[g2[1]]; if (v) return v; }
+    if (/初[一二三]|七[一二三]?年级/.test(raw)) return raw.indexOf("初三") >= 0 || raw.indexOf("九年级") >= 0 ? 9 : (raw.indexOf("初二") >= 0 || raw.indexOf("八年级") >= 0 ? 8 : 7);
+    if (/(高一|十年级)/.test(raw)) return 10;
+    if (/(高二|十一年级)/.test(raw)) return 11;
+    if (/(高三|十二年级)/.test(raw)) return 12;
+    if (raw.indexOf("初中") >= 0) return 8;
+    if (raw.indexOf("高中") >= 0) return 11;
+    if (raw.indexOf("物理") >= 0 || raw.indexOf("化学") >= 0) return 9;
+    if (/(导数|圆锥曲线|数列|向量|电磁感应|有机化学|遗传|哲学)/.test(raw)) return 11;
+    return 4; // 未指明年级：默认小学中期通学段
+  }
+  function classifyStage(grade) {
+    if (grade >= 10) return { id: "senior", label: "高中" };
+    if (grade >= 7) return { id: "junior", label: "初中" };
+    return { id: "primary", label: "小学" };
+  }
+  function detectType(raw) {
+    const H = DATA.lectureHints;
+    let best = "concept", bestScore = 0;
+    Object.keys(H.types).forEach((tk) => {
+      let score = 0;
+      H.types[tk].kws.forEach((w) => { if (raw.indexOf(w) >= 0) score += 1; });
+      if (score > bestScore) { bestScore = score; best = tk; }
+    });
+    return best;
+  }
+  function guessTopic(raw, subject) {
+    const m = material(subject);
+    const pool = (m.concepts || []).concat(m.examPoints || []);
+    let hit = "";
+    pool.forEach((c) => { if (c && c.length > 1 && raw.indexOf(c) >= 0 && c.length > hit.length) hit = c; });
+    if (hit) return hit;
+    const cleaned = raw
+      .replace(/^(请|帮|麻烦|请问|给我|让我)/, "")
+      .replace(/^(什么是|为什么|怎么|如何|怎样|讲讲|讲一下|解释一下)/, "")
+      .replace(/[？?。！!，,：:；;、]/g, "");
+    return (cleaned.slice(0, 12) || "这道题");
+  }
+  function buildAnalysis(raw, subject, topic) {
+    const nums = raw.match(/\d+(?:\.\d+)?/g) || [];
+    const lines = [
+      `先读两遍题目，圈出关键词“${topic}”与条件数据${nums.length ? "（本题出现数字：" + nums.slice(0, 4).join("、") + "）" : ""}。`,
+      `明确要求：题目让我们${raw.indexOf("为什么") >= 0 || raw.indexOf("证明") >= 0 || raw.indexOf("依据") >= 0 ? "说明道理/推理依据" : (raw.indexOf("计算") >= 0 || /[＝=]/.test(raw) ? "算出结果" : "理解并作答")}。`,
+      `把它拆成“已知什么 → 求什么 → 用什么方法”三步，再调用${subject}里的知识来解决。`,
+    ];
+    return lines;
+  }
+
+  /* =================================================
    * v2 · 随堂测验（可实时批改：标准答案 + 解析）
    * ================================================= */
   function makeQuiz(subject, topic, count) {
@@ -670,6 +816,7 @@ window.QIKE_ENGINE = (function () {
     generateLesson, generateInteractive, generateHomework, generateGeometry,
     makeSlides, makeClassroom, makeQuiz, gradeKeyword, classroomReport,
     makePBL, makeExperiment, runExperiment,
+    makeLecture,
     callApi, material, dist, angleDeg,
     vertexLabel: (n) => String(n),
     exportMarkdown: renderMarkdown,

@@ -151,7 +151,7 @@ window.QIKE_UI = (function () {
     if (!win) { warn("浏览器拦截了打印窗口，请允许弹出窗口后重试。"); return; }
     let body = "";
     const container = document.createElement("div");
-    if (art.kind === "lesson") renderLesson(art, container);
+    if (art.kind === "lesson" || art.kind === "lecture") renderLesson(art, container);
     else if (art.kind === "interactive") renderInteractive(art, container);
     else if (art.kind === "homework") renderHomework(art, container);
     const css = `body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:#1c2433;margin:34px;line-height:1.75}

@@ -178,7 +178,7 @@
       return;
     }
     clearBtn.hidden = false;
-    const ico = { lesson: "📗", interactive: "🎯", homework: "📝", geometry: "📐", slides: "🎞️", classroom: "🧑‍🏫", experiment: "⚗️", pbl: "🧩" };
+    const ico = { lesson: "📗", interactive: "🎯", homework: "📝", geometry: "📐", slides: "🎞️", classroom: "🧑‍🏫", experiment: "⚗️", pbl: "🧩", lecture: "💬" };
     state.history.forEach((h) => {
       const li = document.createElement("li");
       li.innerHTML = `
@@ -199,7 +199,7 @@
   function openHistory(id) {
     const h = state.history.find((x) => x.id === id);
     if (!h) return;
-    const viewMap = { lesson: "lesson", interactive: "interactive", homework: "homework", geometry: "geometry", slides: "classroom", classroom: "classroom", experiment: "experiment", pbl: "pbl" };
+    const viewMap = { lesson: "lesson", interactive: "interactive", homework: "homework", geometry: "geometry", slides: "classroom", classroom: "classroom", experiment: "experiment", pbl: "pbl", lecture: "lecture" };
     const view = viewMap[h.kind];
     if (!view) return;
     switchView(view);
@@ -253,6 +253,11 @@
       $("lesson-result").hidden = false;
       $("lesson-result-title").textContent = art.title;
       $("lesson-slides").hidden = false;
+    } else if (art.kind === "lecture") {
+      U.renderLesson(art, $("lecture-paper"));
+      $("lecture-result").hidden = false;
+      $("lecture-result-title").textContent = art.title;
+      $("lecture-slides").hidden = false;
     } else if (art.kind === "interactive") {
       U.renderInteractive(art, $("interactive-paper"));
       $("interactive-result").hidden = false;
@@ -398,6 +403,112 @@
       $("lesson-slides").classList.add("is-lit");
       box.scrollIntoView({ behavior: "smooth", block: "nearest" });
       U.success("已就绪：共 " + deck.count + " 页，可自动放映、跟读讲解或逐页播放。");
+    });
+  }
+
+  /* ---------- 题目讲课（类百度搜索框：文字/语音提问 → 自动讲解课件） ---------- */
+  function initLecture() {
+    const form = $("lecture-form");
+    const input = $("lecture-q");
+    const goBtn = $("lecture-go");
+    const voiceBtn = $("lecture-voice");
+    const demoBox = $("lecture-demos");
+    let player = null;
+
+    function clearPlayer() {
+      if (player) { player.destroy(); player = null; }
+      $("lecture-player").hidden = true;
+      $("lecture-slides").classList.remove("is-lit");
+    }
+    function run(q) {
+      const text = String(q == null ? input.value : q).trim();
+      if (!text) { U.warn("请先输入或说出你的问题或题目内容。"); input.focus(); return; }
+      goBtn.disabled = true; goBtn.textContent = "识别生成中…";
+      setTimeout(() => {
+        const art = E.makeLecture(text);
+        goBtn.disabled = false; goBtn.textContent = "生成讲解";
+        if (!art) { U.warn("没能生成讲解课件，请换一种说法试试。"); return; }
+        clearPlayer();           // 切换新题目时回收旧播放器
+        renderArtifact(art);
+        addHistory(art);
+        saveRecent(art);
+        const d = art.detected;
+        U.success("已识别：" + d.subject + " · " + d.stageLabel + (d.grade && d.grade > 0 ? "（约" + d.grade + "年级）" : "") + " · " + d.typeName + "，共 " + art.slides.length + " 页课件。");
+        input.classList.add("has-value");
+      }, 70);
+    }
+    // 提交
+    form.addEventListener("submit", (e) => { e.preventDefault(); run(); });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(); } });
+    // 语音输入（类百度搜索框的麦克风）
+    voiceBtn.addEventListener("click", () => {
+      const V = window.QIKE_VOICE;
+      if (!V || !V.listen) { U.warn("当前浏览器不支持语音识别，请直接用文字输入。"); return; }
+      const lit = voiceBtn.classList.toggle("is-lit");
+      if (!lit) { clearPlayer(); return; }      // 再点一次取消聆听
+      voiceBtn.disabled = true;
+      V.listen((ok, text, err) => {
+        voiceBtn.disabled = false; voiceBtn.classList.remove("is-lit");
+        if (!ok || !text) { U.warn(err || "没有听清，请重试或改用文字输入。"); return; }
+        input.value = text;
+        run();
+      });
+    });
+    // 示例问题（快速体验 1–12 年级各学段学科）
+    const demos = [
+      { label: "三年级 · 分数加减法", q: "三年级 分数加减法怎么算？比如 1/4 + 2/4 等于多少？" },
+      { label: "初一 · 一元一次方程", q: "初一 解方程：3x + 5 = 20，x 等于多少？" },
+      { label: "初二 · 勾股定理", q: "初二 直角三角形两条直角边是 3 和 4，斜边为什么等于 5？" },
+      { label: "五年级 · 圆的面积", q: "五年级 为什么圆的面积等于 πr²？" },
+      { label: "高一 · 函数定义", q: "高一 什么是函数？为什么 y = 2x + 1 是函数？" },
+      { label: "高三 · 导数几何意义", q: "高三 导数的几何意义是什么？怎么求切线方程？" },
+      { label: "小学 · 古诗背诵", q: "小学 古诗《静夜思》怎么背诵记忆？" },
+      { label: "初三 · 化学方程式", q: "初三 化学方程式配平怎么做？" },
+      { label: "六年级 · 阅读理解", q: "六年级 语文阅读理解怎么概括中心思想？" },
+      { label: "高二 · 英语语法", q: "高二 英语一般过去时和现在完成时有什么区别？" },
+    ];
+    demos.forEach((d) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "lecture-chip";
+      chip.textContent = d.label;
+      chip.title = d.q;
+      chip.addEventListener("click", () => { input.value = d.q; run(); });
+      demoBox.appendChild(chip);
+    });
+    // 结果区：打印 / 导出 / 幻灯片
+    $("lecture-print").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再导出文件。"); return; }
+      U.printArt(art, "题目讲解课件");
+    });
+    $("lecture-export-pptx").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再导出文件。"); return; }
+      const r = window.QIKE_EXPORT.exportPPTX(art, "qike-lecture-" + window.QIKE_EXPORT.safeName(art.title) + ".pptx");
+      U.success(r.ok ? "PPTX 已导出：" + r.slides + " 页（可逐元素编辑）" : "导出失败：" + r.reason);
+    });
+    $("lecture-export-html").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再导出文件。"); return; }
+      const r = window.QIKE_EXPORT.exportHTML(art, "qike-lecture-" + window.QIKE_EXPORT.safeName(art.title) + "-interactive.html", {});
+      U.success(r.ok ? "交互式 HTML 已导出，可离线打开" : "导出失败");
+    });
+    $("lecture-slides").addEventListener("click", () => {
+      const art = state.lastArt.lecture;
+      if (!art) { U.warn("请先生成讲解课件，再进入幻灯片讲课。"); return; }
+      if (player) { clearPlayer(); return; }
+      if (!art.slides || !art.slides.length) { U.warn("这份讲解没有可用的幻灯片结构，无法讲课。"); return; }
+      const box = $("lecture-player");
+      box.hidden = false;
+      player = U.mountSlides(art.slides, box, { spotlight: true, laser: true });
+      $("lecture-slides").classList.add("is-lit");
+      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      U.success("已就绪：共 " + art.slides.length + " 页，可自动放映、跟读讲解或逐页播放。");
+    });
+    // 快捷引导：把搜索框放回页面顶部
+    $("lecture-backtop") && $("lecture-backtop").addEventListener("click", () => {
+      $("view-lecture").scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -1091,7 +1202,7 @@
   }
 
   function init() {
-    initLesson(); initInteractive(); initClassroom(); initHomework(); initGeometry(); initExperiment(); initPBL(); initSearch();
+    initLesson(); initLecture(); initInteractive(); initClassroom(); initHomework(); initGeometry(); initExperiment(); initPBL(); initSearch();
     initSettings(); initMobileNav(); initQuickCards();
     // 导航
     document.querySelectorAll(".nav-btn").forEach((b) => {

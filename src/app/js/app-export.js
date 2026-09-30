@@ -426,6 +426,9 @@ window.QIKE_EXPORT = (function () {
   function toSlides(art) {
     if (!art) return [];
     const meta = art.meta || {};
+    if (art.kind === "lecture") {
+      return (art.slides || []).map((s) => ({ kicker: s.kicker, title: s.title, sub: s.sub, bullets: s.bullets }));
+    }
     if (art.kind === "lesson") {
       const deck = ENGINE.makeSlides(art);
       return (deck && deck.slides ? deck.slides : []);

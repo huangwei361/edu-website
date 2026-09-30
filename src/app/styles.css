@@ -325,6 +325,54 @@ input::placeholder{color:var(--text-muted)}
 .paper .paper-empty{color:#8a93a6;font-style:italic}
 .paper .check{color:#179863;font-weight:700}
 
+/* ============ 题目讲课（类百度搜索框） ============ */
+.lecture-search-wrap{
+  padding:26px 26px 18px;
+  background:linear-gradient(180deg,#f5f9ff,#fff);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+}
+.lecture-form{max-width:880px;margin:0 auto}
+.lecture-box{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border:2px solid #d8e3f5;border-radius:999px;
+  padding:10px 10px 10px 20px;
+  box-shadow:0 6px 22px rgba(20,87,217,.08);
+  transition:border-color .2s,box-shadow .2s;
+}
+.lecture-box:focus-within{border-color:var(--action);box-shadow:0 0 0 4px rgba(20,87,217,.14),0 6px 22px rgba(20,87,217,.10)}
+.lecture-lens{width:22px;height:22px;flex:none;fill:none;stroke:var(--action);stroke-width:2;stroke-linecap:round}
+.lecture-input{
+  flex:1;min-width:0;border:none;outline:none;background:transparent;
+  font-size:17px;color:#1c2433;font-family:var(--sans);
+}
+.lecture-input::placeholder{color:#9aa7c2}
+.lecture-mic{color:var(--action);transition:color .2s}
+.lecture-mic svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lecture-mic.is-lit{color:#e1455d;background:#fdeef1;animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.lecture-go{border-radius:999px;padding:10px 22px;white-space:nowrap}
+.lecture-go svg{fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lecture-demos{
+  margin-top:14px;display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;
+  justify-content:center;
+}
+.lecture-demos-label{font-size:12.5px;color:var(--text-muted);line-height:30px}
+.lecture-chips{display:flex;gap:8px;flex-wrap:wrap}
+.lecture-chip{
+  border:1px solid #d9e4f7;background:#fff;color:#3a4b6b;
+  border-radius:999px;padding:5px 14px;font-size:12.5px;cursor:pointer;
+  transition:all .18s;
+}
+.lecture-chip:hover{border-color:var(--action);color:var(--action);background:#eef4ff}
+.lecture-input.has-value{border-color:transparent}
+@media (max-width:640px){
+  .lecture-search-wrap{padding:18px 14px 14px}
+  .lecture-box{border-radius:18px;flex-wrap:wrap;padding:8px}
+  .lecture-input{flex-basis:100%;font-size:15px;padding:4px 8px}
+  .lecture-go{flex:1;justify-content:center}
+}
+
 /* ============ 交互式模拟实验 ============ */
 .exp-card{
   background:#fff;color:#1c2433;border-radius:var(--r-lg);
