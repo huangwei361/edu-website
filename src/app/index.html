@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="启课智能教学台：面向小学、初中与高中教师的 AI 教学生成软件，一键生成课件、互动课堂、作业与评测、几何图形，内容对齐国家课程标准。">
+<title>启课智能教学台 · Qike Studio</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<header class="topbar" id="topbar">
+  <div class="brand" role="banner">
+    <div class="brand-mark" aria-hidden="true">启</div>
+    <div class="brand-text">
+      <span class="brand-name">启课智能教学台</span>
+      <span class="brand-sub">Qike Studio · 教学生成软件</span>
+    </div>
+  </div>
+  <nav class="topnav" id="topnav" aria-label="主导航">
+    <button class="nav-btn is-active" data-view="dashboard" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span>工作台</span>
+    </button>
+    <button class="nav-btn" data-view="lesson">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>
+      <span>课件生成</span>
+    </button>
+    <button class="nav-btn" data-view="interactive">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span>互动课堂</span>
+    </button>
+    <button class="nav-btn" data-view="homework">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg>
+      <span>作业评测</span>
+    </button>
+    <button class="nav-btn" data-view="geometry">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>几何引擎</span>
+    </button>
+    <button class="nav-btn" data-view="classroom">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M8 4h8M8 13h4M8 17h6M16 16h1M16 12h1"/></svg>
+      <span>AI 课堂</span>
+    </button>
+    <button class="nav-btn" data-view="experiment">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6.3L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9.3V3"/><path d="M7 15h10"/></svg>
+      <span>模拟实验</span>
+    </button>
+    <button class="nav-btn" data-view="pbl">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6 6 .9-4.4 4.3 1.1 6.2L12 16.6 6.3 19.4l1.1-6.2L3 8.9 9 8l3-6z"/></svg>
+      <span>项目学习</span>
+    </button>
+    <button class="nav-btn" data-view="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35M8 11h6M11 8v6"/></svg>
+      <span>联网搜索</span>
+    </button>
+  </nav>
+  <div class="topbar-actions">
+    <button class="icon-btn" id="btn-help" aria-label="帮助" title="帮助">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" aria-label="设置" title="设置">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main" class="main" tabindex="-1">
+
+  <!-- ============ 工作台 ============ -->
+  <section class="view" id="view-dashboard" aria-labelledby="dashboard-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker" id="dashboard-title">欢迎回来 👋</p>
+        <h2>今天想生成什么课堂内容？</h2>
+        <p class="view-desc">从教材章节出发，几分钟内得到可编辑、可导出的教学成果。所有内容均按国家课程标准口径生成，起始生成由本地引擎完成，配置大模型 API 后可升级为深度生成。</p>
+      </div>
+    </div>
+    <div class="quick-grid" id="quick-cards">
+      <button class="quick-card" data-goto="lesson">
+        <span class="quick-ico" aria-hidden="true">📗</span>
+        <b>课件生成</b>
+        <span>五环节完整课件，可编辑可导出</span>
+      </button>
+      <button class="quick-card" data-goto="interactive">
+        <span class="quick-ico" aria-hidden="true">🎯</span>
+        <b>互动课堂</b>
+        <span>提问、抢答、随堂测一键生成</span>
+      </button>
+      <button class="quick-card" data-goto="homework">
+        <span class="quick-ico" aria-hidden="true">📝</span>
+        <b>作业评测</b>
+        <span>基础/提升/拓展分层与答案解析</span>
+      </button>
+      <button class="quick-card" data-goto="geometry">
+        <span class="quick-ico" aria-hidden="true">📐</span>
+        <b>几何引擎</b>
+        <span>确定性建模、渲染与验证</span>
+      </button>
+      <button class="quick-card" data-goto="classroom">
+        <span class="quick-ico" aria-hidden="true">🧑‍🏫</span>
+        <b>AI 课堂</b>
+        <span>多角色 AI 课堂、语音讲课与互动测验</span>
+      </button>
+      <button class="quick-card" data-goto="experiment">
+        <span class="quick-ico" aria-hidden="true">⚗️</span>
+        <b>模拟实验</b>
+        <span>平抛、弹簧振子、π 探究交互实验</span>
+      </button>
+      <button class="quick-card" data-goto="pbl">
+        <span class="quick-ico" aria-hidden="true">🧩</span>
+        <b>项目学习</b>
+        <span>驱动性问题、里程碑与评价量表</span>
+      </button>
+      <button class="quick-card" data-goto="search">
+        <span class="quick-ico" aria-hidden="true">🔎</span>
+        <b>联网搜索</b>
+        <span>即时答案摘要，新标签页兜底</span>
+      </button>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>最近生成</h3>
+        <button class="link-btn" id="btn-clear-history" hidden>清空</button>
+      </div>
+      <ul class="history-list" id="history-list">
+        <li class="empty-hint">还没有生成记录。去上面挑一个模块，开始您的第一份课堂成果吧！</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 课件生成 ============ -->
+  <section class="view" id="view-lesson" hidden aria-labelledby="lesson-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">课件生成</p>
+        <h2 id="lesson-title">一节好课，从生成开始</h2>
+        <p class="view-desc">选择学段、学科、教材版本与章节，一键生成含教学目标、情境导入、讲授要点、互动提问、课堂练习与课堂小结的完整课件。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="lesson-form">
+        <div class="field-row">
+          <label>学段<select id="lesson-stage" required></select></label>
+          <label>年级<select id="lesson-grade" required></select></label>
+          <label>学科<select id="lesson-subject" required></select></label>
+          <label>教材版本<select id="lesson-version" required></select></label>
+        </div>
+        <div class="field-row">
+          <label>章节/单元<select id="lesson-chapter" required></select></label>
+          <label>课时主题<input type="text" id="lesson-topic" placeholder="如：分数的初步认识（留空则取章节）"></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit" id="lesson-gen-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            生成课件
+          </button>
+          <span class="hint" id="lesson-hint">本地引擎即时生成 · 约 1 秒</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="lesson-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title" id="lesson-result-title">课件大纲</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="lesson-regen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+            重新生成
+          </button>
+          <button class="btn btn-ghost" id="lesson-print">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            打印/导出
+          </button>
+          <button class="btn btn-ghost" id="lesson-export-pptx" title="导出为可逐元素编辑的 PPTX（每环节一页）">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 8l4 7 4-7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出 PPTX
+          </button>
+          <button class="btn btn-ghost" id="lesson-export-html" title="导出为自包含交互式 HTML（课件+测验可作答、可离线打开）">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v5h5"/><path d="M14 3l6 6v12H4V3h10z"/><path d="M9 12l-2 2 2 2M13 12l2 2-2 2" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出 HTML
+          </button>
+          <button class="btn btn-primary" id="lesson-slides" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="11" rx="2"/><path d="M8 21h8m-4-6v6"/></svg>
+            🎞 幻灯片讲课
+          </button>
+        </div>
+      </div>
+      <div class="paper" id="lesson-paper"></div>
+      <div class="sp-player" id="lesson-player" hidden aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============ 互动课堂 ============ -->
+  <section class="view" id="view-interactive" hidden aria-labelledby="interactive-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">互动课堂</p>
+        <h2 id="interactive-title">把课堂交还给学生</h2>
+        <p class="view-desc">围绕本节内容生成类型丰富的互动活动：随机提问、抢答、随堂测验、小组任务与游戏化小测，可直接投屏使用。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="interactive-form">
+        <div class="field-row">
+          <label>互动类型<select id="interactive-type" required>
+            <option value="question">随机提问</option>
+            <option value="race">课堂抢答</option>
+            <option value="quiz">随堂测验</option>
+            <option value="group">小组任务</option>
+            <option value="game">游戏化小测</option>
+          </select></label>
+          <label>学段<select id="interactive-stage" required></select></label>
+          <label>学科<select id="interactive-subject" required></select></label>
+        </div>
+        <div class="field-row">
+          <label>本课主题<input type="text" id="interactive-topic" placeholder="如：分数的初步认识（留空则取学科）"></label>
+          <label>题量/题目数<select id="interactive-count">
+            <option value="5">5 题</option>
+            <option value="8">8 题</option>
+            <option value="10" selected>10 题</option>
+            <option value="12">12 题</option>
+          </select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit">生成互动活动</button>
+          <span class="hint">本地引擎即时生成 · 约 1 秒</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="interactive-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">课堂互动包</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="interactive-print">打印/导出</button>
+          <button class="btn btn-ghost" id="interactive-export-pptx" title="导出为 PPTX（每环节一页）">导出 PPTX</button>
+          <button class="btn btn-ghost" id="interactive-export-html" title="导出为交互式 HTML（题目可作答/查看答案）">导出 HTML</button>
+          <button class="btn btn-primary" id="interactive-quiz" hidden>🧪 实时测验</button>
+        </div>
+      </div>
+      <div class="paper" id="interactive-paper"></div>
+      <div class="qz-player" id="quiz-player" hidden aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============ 作业评测 ============ -->
+  <section class="view" id="view-homework" hidden aria-labelledby="homework-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">作业评测</p>
+        <h2 id="homework-title">分层作业，人人有收获</h2>
+        <p class="view-desc">按「基础巩固、能力提升、拓展挑战」三层生成作业，每题附答案解析与评分标准，减轻批改负担、支持分层教学。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="homework-form">
+        <div class="field-row">
+          <label>学段<select id="homework-stage" required></select></label>
+          <label>学科<select id="homework-subject" required></select></label>
+          <label>作业主题<input type="text" id="homework-topic" placeholder="如：分数的加减法（留空则取学科）"></label>
+        </div>
+        <div class="field-row">
+          <label>分层强度<select id="homework-level">
+            <option value="mild" selected>温和分层（7:2:1）</option>
+            <option value="balanced">均衡分层（6:3:1）</option>
+            <option value="steep">强分层（5:3:2）</option>
+          </select></label>
+          <label>总题数<select id="homework-count">
+            <option value="10">10 题</option>
+            <option value="15" selected>15 题</option>
+            <option value="20">20 题</option>
+          </select></label>
+          <label>是否附答案<select id="homework-answer">
+            <option value="yes" selected>附答案与解析</option>
+            <option value="no">仅题目</option>
+          </select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit">生成分层作业</button>
+          <span class="hint">本地引擎即时生成 · 约 1 秒</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="homework-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">分层作业</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="homework-print">打印/导出</button>
+          <button class="btn btn-ghost" id="homework-export-pptx" title="导出为 PPTX（按分层分页）">导出 PPTX</button>
+          <button class="btn btn-ghost" id="homework-export-html" title="导出为 HTML（附参考答案）">导出 HTML</button>
+        </div>
+      </div>
+      <div class="paper" id="homework-paper"></div>
+    </div>
+  </section>
+
+  <!-- ============ 几何引擎 ============ -->
+  <section class="view" id="view-geometry" hidden aria-labelledby="geometry-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">几何图形引擎</p>
+        <h2 id="geometry-title">符号化建模 · 确定性渲染 · 可验证</h2>
+        <p class="view-desc">用参数描述几何对象，引擎按确定性规则渲染 SVG 图形并运行验证器断言其性质，保证图形与题干一致、可直接用于课件与作业。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="geometry-form">
+        <div class="field-row">
+          <label>图形类型<select id="geometry-type" required>
+            <option value="triangle">三角形</option>
+            <option value="quad">四边形</option>
+            <option value="circle">圆</option>
+          </select></label>
+          <label>形状设定<select id="geometry-shape">
+            <option value="scalene">任意三角形</option>
+            <option value="right">直角三角形</option>
+            <option value="isosceles">等腰三角形</option>
+            <option value="equilateral">等边三角形</option>
+          </select></label>
+          <label>图形尺寸<input type="number" id="geometry-size" value="220" min="120" max="380" step="10" aria-label="图形尺寸"></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit">建模并渲染</button>
+          <span class="hint">确定性引擎 · 验证器随图运行</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="geometry-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">几何图形与验证报告</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="geometry-download-svg">下载 SVG</button>
+          <button class="btn btn-ghost" id="geometry-print">打印/导出</button>
+        </div>
+      </div>
+      <div class="geometry-layout">
+        <div class="paper geo-canvas-wrap" id="geometry-canvas"></div>
+        <div class="paper geo-report" id="geometry-report"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AI 课堂 ============ -->
+  <section class="view" id="view-classroom" hidden aria-labelledby="classroom-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">AI 课堂</p>
+        <h2 id="classroom-title">像 OpenMAIC 一样的多角色 AI 课堂</h2>
+        <p class="view-desc">AI 主讲教师 + 助教 + 三类性格同学同堂互动。可文字或语音答题、即时批改打分，内置实时共享白板与课堂状态条，结束自动生成课堂报告。支持一键推送开课到飞书 / Slack / Telegram。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="classroom-form">
+        <div class="field-row">
+          <label>学段<select id="classroom-stage" required></select></label>
+          <label>学科<select id="classroom-subject" required></select></label>
+          <label>本课主题<input type="text" id="classroom-topic" placeholder="如：分数的初步认识"></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit" id="classroom-start-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
+            开始 AI 课堂
+          </button>
+          <span class="hint">多角色话术由本地引擎生成 · 可配大模型升级</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="classroom-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title" id="classroom-result-title">AI 课堂进行中</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="classroom-open-webhook">📤 一键开课</button>
+          <button class="btn btn-ghost" id="classroom-copy-link">🔗 复制课堂链接</button>
+          <button class="btn btn-ghost" id="classroom-report-btn">结束并生成课堂报告</button>
+        </div>
+      </div>
+      <div id="classroom-shell"></div>
+      <div id="classroom-board-host"></div>
+      <div id="classroom-report" hidden></div>
+    </div>
+  </section>
+
+  <!-- ============ 模拟实验 ============ -->
+  <section class="view" id="view-experiment" hidden aria-labelledby="experiment-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">交互式模拟实验</p>
+        <h2 id="experiment-title">动手探究，眼见为实</h2>
+        <p class="view-desc">三款确定性仿真实验：平抛运动、弹簧振子、圆与圆周率探究（正多边形逼近）。拖动参数滑杆实时观察动画，实验同时运行数值公式断言，验证结论是否成立。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="experiment-form">
+        <div class="field-row">
+          <label>实验<select id="experiment-select" required></select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit" id="experiment-run-btn">运行实验</button>
+          <span class="hint">确定性动画 · 数值断言随运行验证</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="experiment-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title" id="experiment-result-title">实验台</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="experiment-reset-btn">重置参数</button>
+          <button class="btn btn-ghost" id="experiment-print">打印实验记录</button>
+        </div>
+      </div>
+      <div id="experiment-stage"></div>
+    </div>
+  </section>
+
+  <!-- ============ 项目学习 ============ -->
+  <section class="view" id="view-pbl" hidden aria-labelledby="pbl-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">项目式学习 PBL</p>
+        <h2 id="pbl-title">从一个驱动性问题开始</h2>
+        <p class="view-desc">围绕真实情境生成驱动性问题、项目背景、四个里程碑、任务卡、成果要求与评价量表，可直接打印发给学生小组。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="pbl-form">
+        <div class="field-row">
+          <label>学段<select id="pbl-stage" required></select></label>
+          <label>学科<select id="pbl-subject" required></select></label>
+          <label>项目主题<input type="text" id="pbl-topic" placeholder="如：校园水资源的调查报告"></label>
+        </div>
+        <div class="field-row">
+          <label>项目周期（课时）<select id="pbl-period">
+            <option value="4">4 课时（半日营）</option>
+            <option value="8">8 课时（两周）</option>
+            <option value="12">12 课时（三周）</option>
+          </select></label>
+          <label>小组人数<select id="pbl-size">
+            <option value="4">4 人小组</option>
+            <option value="5">5 人小组</option>
+            <option value="6">6 人小组</option>
+          </select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit" id="pbl-gen-btn">生成项目方案</button>
+          <span class="hint">驱动问题 → 里程碑 → 任务卡 → 评价量表</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="pbl-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">项目方案</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="pbl-print">打印/导出</button>
+          <button class="btn btn-ghost" id="pbl-export-pptx" title="导出为 PPTX（驱动问题/里程碑/任务卡/量表各一页）">导出 PPTX</button>
+          <button class="btn btn-ghost" id="pbl-export-html" title="导出为交互式 HTML">导出 HTML</button>
+        </div>
+      </div>
+      <div class="paper" id="pbl-paper"></div>
+    </div>
+  </section>
+
+  <!-- ============ 联网搜索 ============ -->
+  <section class="view" id="view-search" hidden aria-labelledby="search-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">联网搜索</p>
+        <h2 id="search-title">给课堂再找点真实素材</h2>
+        <p class="view-desc">输入关键词，先内联展示 DuckDuckGo 即时答案摘要与相关话题，差口气时一键在新标签页用 Bing / 百度 / Google 继续搜。离线时给出友好提示，不影响其它功能。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="search-form">
+        <div class="field-row">
+          <label>搜索关键词<input type="text" id="search-q" placeholder="如：三角形内角和 180 度 / 光合作用 反应式" required></label>
+          <label>兜底引擎<select id="search-engine">
+            <option value="bing">Bing 必应</option>
+            <option value="baidu">百度</option>
+            <option value="google">Google</option>
+          </select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit" id="search-go">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            搜索
+          </button>
+          <span class="hint">联网获取即时答案 · 失败自动提示</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="search-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title" id="search-result-title">搜索结果</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="search-open">在新标签页打开原文引擎</button>
+        </div>
+      </div>
+      <div class="paper" id="search-paper"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 帮助抽屉 ============ -->
+<div class="drawer" id="help-drawer" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+  <div class="drawer-mask" data-close></div>
+  <aside class="drawer-panel">
+    <div class="drawer-head">
+      <h3 id="help-title">帮助中心</h3>
+      <button class="icon-btn" data-close aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <h4>📍 从哪里开始？</h4>
+      <p>先进入「课件生成」挑一个章节试试，满意后再到「互动课堂」「作业评测」补充课堂配套。</p>
+      <h4>⚙️ 生成引擎说明</h4>
+      <p>当前为本地模板引擎：按国家课程标准的结构与常见教学法，从内置素材库中组合生成，断网也能用。</p>
+      <p>在「设置」中填入大模型 API 后，将切换为 API 深度生成，回答更富个性化。</p>
+      <h4>📐 几何引擎怎么用？</h4>
+      <p>选择图形类型、形状与尺寸，引擎会给出 <b>模型 → 渲染 → 验证</b> 三段式结果：SVG 图形 + 边长/角度/性质断言，全部通过标记 ✓。</p>
+      <h4>🧑‍🏫 AI 课堂是什么？</h4>
+      <p>对标 OpenMAIC 的多角色课堂：AI 老师主讲、助教补充讲解、三类同学（学霸质疑 / 问题达人 / 小白提问）参与互动。学生可文字或语音答题，关键词即时批改打分；配合实时共享白板随讲随写，结束后生成课堂报告。</p>
+      <h4>⚗️ 模拟实验能验证什么？</h4>
+      <p>三款确定性仿真：平抛运动、弹簧振子、圆与 π（正多边形逼近）。动画由参数实时驱动，同时运行数值公式断言（如 t=√(2h/g)、T=2π√(m/k)），可点开逐条核对。</p>
+      <h4>🧩 项目学习 PBL？</h4>
+      <p>生成驱动性问题 → 项目背景 → 四个里程碑 → 任务卡 → 成果要求 → 评价量表，整套可打印，直接组织小组探究课。</p>
+      <h4>🔊 语音与联网怎么用？</h4>
+      <p>浏览器支持时用 Web Speech 语音讲课（TTS）与语音答题（STT），不支持自动降级为文字；联网搜索面板可内联展示摘要并在新标签打开原文。</p>
+      <h4>📤 一键开课？</h4>
+      <p>在「设置 > 一键开课渠道」配置飞书 / Slack Webhook 或 Telegram Bot（Token 或完整 sendMessage 链接），课堂进行中点击「一键开课」即可把课题与课堂链接推送到对应群。</p>
+      <p>「复制课堂链接」复制本页地址（带 #classroom），发给学生或同事，打开后会自动定位到课堂视图，无需额外安装。</p>
+      <h4>📄 结果能做什么？</h4>
+      <p>打印/导出为可打印页面；几何图形可单独下载 SVG，直接插入 Word 或课件。</p>
+      <h4>🔒 数据说明</h4>
+      <p>生成历史、设置与 API Key 默认保存在本机浏览器中，可随时清空；本应用无服务器，请求直达你填写的接口，不上传任何内容。</p>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ 设置对话框 ============ -->
+<div class="drawer" id="settings-drawer" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+  <div class="drawer-mask" data-close></div>
+  <aside class="drawer-panel">
+    <div class="drawer-head">
+      <h3 id="settings-title">设置</h3>
+      <button class="icon-btn" data-close aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <h4>生成引擎</h4>
+      <label class="row">生成模式
+        <select id="set-engine">
+          <option value="local">本地引擎（默认，离线可用）</option>
+          <option value="api">API 深度生成</option>
+          <option value="hybrid">混合模式：本地优先，API 升级</option>
+        </select>
+      </label>
+      <details class="api-box" open>
+        <summary>多模型路由配置（高级）</summary>
+        <p class="mini-hint">每个场景可分配不同的模型槽位；留空则回退本地引擎。Key 只保存在本机浏览器中。</p>
+        <div class="model-slots">
+          <div class="model-slot">
+            <div class="slot-head">槽位 A · 通用生成</div>
+            <label class="row">接口地址
+              <input type="url" id="set-slot-a-url" placeholder="https://api.openai.com/v1/chat/completions">
+            </label>
+            <label class="row">模型名称
+              <input type="text" id="set-slot-a-model" placeholder="gpt-4o">
+            </label>
+            <label class="row">API Key
+              <input type="password" id="set-slot-a-key" placeholder="sk-...（仅存于本机）" autocomplete="off">
+            </label>
+          </div>
+          <div class="model-slot">
+            <div class="slot-head">槽位 B · 课堂/语音场景</div>
+            <label class="row">接口地址
+              <input type="url" id="set-slot-b-url" placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions">
+            </label>
+            <label class="row">模型名称
+              <input type="text" id="set-slot-b-model" placeholder="qwen-max">
+            </label>
+            <label class="row">API Key
+              <input type="password" id="set-slot-b-key" placeholder="sk-...（仅存于本机）" autocomplete="off">
+            </label>
+          </div>
+          <div class="model-slot">
+            <div class="slot-head">槽位 C · 实验/科学推理</div>
+            <label class="row">接口地址
+              <input type="url" id="set-slot-c-url" placeholder="https://api.deepseek.com/v1/chat/completions">
+            </label>
+            <label class="row">模型名称
+              <input type="text" id="set-slot-c-model" placeholder="deepseek-chat">
+            </label>
+            <label class="row">API Key
+              <input type="password" id="set-slot-c-key" placeholder="sk-...（仅存于本机）" autocomplete="off">
+            </label>
+          </div>
+        </div>
+        <h5 class="slot-sub">场景路由（每列选一个槽位）</h5>
+        <div class="route-grid">
+          <label class="row">课件/作业生成
+            <select id="route-lesson"><option value="A">槽位 A</option><option value="B">槽位 B</option><option value="C">槽位 C</option></select>
+          </label>
+          <label class="row">AI 课堂/语音
+            <select id="route-classroom"><option value="A">槽位 A</option><option value="B" selected>槽位 B</option><option value="C">槽位 C</option></select>
+          </label>
+          <label class="row">实验/推理
+            <select id="route-experiment"><option value="A">槽位 A</option><option value="B">槽位 B</option><option value="C" selected>槽位 C</option></select>
+          </label>
+        </div>
+      </details>
+      <details class="api-box">
+        <summary>一键开课渠道（飞书 / Slack / Telegram）</summary>
+        <label class="row">飞书机器人 Webhook
+          <input type="url" id="set-webhook-feishu" placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/...">
+        </label>
+        <label class="row">Slack Webhook
+          <input type="url" id="set-webhook-slack" placeholder="https://hooks.slack.com/services/...">
+        </label>
+        <label class="row">Telegram Bot Token 或 sendMessage 链接
+          <input type="password" id="set-webhook-telegram" placeholder="123456:ABC-... 或 https://api.telegram.org/bot&lt;TOKEN&gt;/sendMessage?chat_id=...（仅存于本机）" autocomplete="off">
+        </label>
+        <p class="mini-hint">开课时把课堂标题与链接发送到配置的渠道；未配置的渠道自动跳过。Telegram 填完整 sendMessage 链接最稳；只填 Token 时自动使用最近一次与该机器人的会话。</p>
+      </details>
+      <details class="api-box">
+        <summary>语音交互开关（TTS 讲解 / STT 语音答题）</summary>
+        <label class="row switch-row"><input type="checkbox" id="set-voice-tts" checked> TTS 语音讲课（幻灯片跟读 / 课堂讲解）
+          <span class="mini-hint">浏览器不支持或关闭时，自动回落为文字讲解。</span>
+        </label>
+        <label class="row switch-row"><input type="checkbox" id="set-voice-stt" checked> STT 语音答题（AI 课堂语音作答）
+          <span class="mini-hint">浏览器不支持或关闭时，自动回落为文字作答。</span>
+        </label>
+      </details>
+      <div class="settings-actions">
+        <button class="btn btn-primary" id="settings-save">保存设置</button>
+        <button class="btn btn-ghost" id="settings-reset">恢复默认</button>
+      </div>
+      <h4 class="mt">关于</h4>
+      <p class="mini-hint">启课智能教学台 Qike Studio v2.0 · 面向 1–9 年级教师的多角色 AI 教学生成软件原型。技术路线对标清华大学开源项目 OpenMAIC，聚焦义务教育场景做本地可核验的生成式教学。</p>
+      <p class="mini-hint">内容口径依据《义务教育课程标准》公开框架与主流教材章节结构编排。</p>
+    </div>
+  </aside>
+</div>
+
+<div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+<script src="js/app-content.js"></script>
+<script src="js/app-data.js"></script>
+<script src="js/app-engine.js"></script>
+<script src="js/app-voice.js"></script>
+<script src="js/app-whiteboard.js"></script>
+<script src="js/app-search.js"></script>
+<script src="js/app-ui.js"></script>
+<script src="js/app-main.js"></script>
+</body>
+</html>
