@@ -1,0 +1,5 @@
+.design-suite/
+.dumate/
+.tmp/
+*.docx
+dist/
