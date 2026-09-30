@@ -1,0 +1,2503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="启课智能教学台：面向小学、初中与高中教师的 AI 教学生成软件，一键生成课件、互动课堂、作业与评测、几何图形，内容对齐国家课程标准。">
+<title>启课智能教学台 · Qike Studio</title>
+<style>
+/* ============ 启课智能教学台 · 设计令牌 ============ */
+:root{
+  --canvas:#0b1220;          /* 深蓝科技底 */
+  --canvas-2:#0e1628;
+  --panel:#121d33;
+  --panel-2:#16233d;
+  --panel-soft:#1a2947;
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.18);
+  --text:#eef2fb;
+  --text-soft:#b8c4dc;
+  --text-muted:#7d8ca9;
+  --action:#1457d9;
+  --action-hover:#2b6cf0;
+  --action-soft:rgba(20,87,217,.22);
+  --accent:#6fb7ff;
+  --success:#3ddc97;
+  --warning:#ffc24b;
+  --danger:#ff6b6b;
+  --r-sm:8px;--r-md:14px;--r-lg:20px;
+  --shadow:0 12px 34px rgba(0,0,0,.34);
+  --shadow-sm:0 4px 14px rgba(0,0,0,.28);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:Consolas,"SFMono-Regular",Menlo,monospace;
+  --topbar-h:64px;
+  --content:1120px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:
+    radial-gradient(1200px 520px at 12% -8%, rgba(20,87,217,.20), transparent 60%),
+    radial-gradient(900px 480px at 96% 4%, rgba(23,105,170,.14), transparent 55%),
+    var(--canvas);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  font-size:15px;line-height:1.65;
+}
+::selection{background:rgba(20,87,217,.5)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:0;z-index:99;background:var(--action);color:#fff;padding:10px 16px;border-radius:0 0 8px 0}
+.skip-link:focus{left:0;color:#fff}
+svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;width:20px;height:20px;flex:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+[hidden]{display:none!important}
+
+/* ============ 顶栏 ============ */
+.topbar{
+  position:sticky;top:0;z-index:50;height:var(--topbar-h);
+  display:flex;align-items:center;gap:22px;padding:0 26px;
+  background:rgba(11,18,32,.86);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{
+  width:40px;height:40px;border-radius:11px;flex:none;
+  background:linear-gradient(135deg,#2f7bff,#1457d9 58%,#0f47b7);
+  display:grid;place-items:center;font-size:20px;font-weight:800;color:#fff;
+  box-shadow:0 8px 20px rgba(20,87,217,.42);
+}
+.brand-text{display:flex;flex-direction:column;line-height:1.15}
+.brand-name{font-size:17px;font-weight:800;letter-spacing:.4px}
+.brand-sub{font-size:11.5px;color:var(--text-muted)}
+.topnav{display:flex;gap:6px;margin-left:auto}
+.nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 14px;border-radius:12px;color:var(--text-soft);
+  font-size:12px;transition:background .18s,color .18s;
+}
+.nav-btn svg{width:19px;height:19px}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.nav-btn.is-active{background:var(--action-soft);color:#8db6ff}
+.nav-btn.is-active svg{color:var(--accent)}
+.nav-btn[aria-current="page"]{font-weight:600}
+.topbar-actions{display:flex;gap:8px}
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  color:var(--text-soft);transition:background .18s,color .18s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.topbar-actions #nav-toggle{display:none}
+
+/* ============ 主容器 ============ */
+.main{max-width:var(--content);margin:0 auto;padding:34px 26px 90px;outline:none}
+.view{animation:rise .34s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view-head{margin-bottom:24px}
+.kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--accent);font-size:13px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+}
+.kicker::before{content:"";width:18px;height:2px;background:linear-gradient(90deg,var(--action),transparent);border-radius:2px}
+.view-head h2{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:8px}
+.view-desc{color:var(--text-soft);max-width:760px;margin-top:8px;font-size:14.5px}
+
+/* ============ 面板/表单 ============ */
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--canvas-2));
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:22px;margin-bottom:22px;box-shadow:var(--shadow-sm);
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.panel-head h3{font-size:17px;font-weight:700}
+.link-btn{color:var(--accent);font-size:13px;padding:6px 10px;border-radius:8px}
+.link-btn:hover{background:rgba(111,183,255,.12)}
+.gen-form{display:flex;flex-direction:column;gap:16px}
+.field-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+label{display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-soft);font-weight:600}
+select,input[type=text],input[type=url],input[type=number],input[type=password]{
+  font-family:inherit;font-size:14px;color:var(--text);
+  background:rgba(255,255,255,.055);border:1px solid var(--line-strong);
+  border-radius:10px;padding:10px 12px;transition:border .18s,background .18s,box-shadow .18s;
+}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-soft) 50%),linear-gradient(135deg,var(--text-soft) 50%,transparent 50%);background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+select option{background:var(--panel);color:var(--text)}
+select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(111,183,255,.16);background:rgba(255,255,255,.08);outline:none}
+input::placeholder{color:var(--text-muted)}
+.gen-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.hint{color:var(--text-muted);font-size:12.5px}
+
+/* ============ 按钮 ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  padding:11px 20px;border-radius:12px;font-size:14px;font-weight:700;
+  transition:transform .15s,box-shadow .2s,background .2s,color .2s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(135deg,#2b6cf0,var(--action) 60%,#0f47b7);color:#fff;box-shadow:0 8px 22px rgba(20,87,217,.36)}
+.btn-primary:hover{box-shadow:0 10px 28px rgba(20,87,217,.5);transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line-strong)}
+.btn-ghost:hover{background:rgba(255,255,255,.13)}
+.btn-ghost svg{width:18px;height:18px}
+
+/* ============ 结果区 ============ */
+.result-wrap{margin-top:22px;animation:rise .34s ease both}
+.result-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.result-title{font-size:19px;font-weight:800}
+.toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.paper{
+  background:#fff;color:#1c2433;border-radius:var(--r-lg);
+  padding:34px 38px;box-shadow:var(--shadow);font-family:var(--sans);
+}
+.paper h1{font-size:22px;color:#0b1220;margin-bottom:2px}
+.paper h2{font-size:17px;color:var(--action);border-bottom:2px solid #e3ecfb;padding-bottom:6px;margin:24px 0 10px}
+.paper h3{font-size:15px;color:#1457d9;margin:16px 0 6px}
+.paper p{margin:6px 0;color:#37415a}
+.paper li{margin:5px 0 5px 2px;color:#37415a}
+.paper ol,.paper ul{padding-left:22px}
+.paper .paper-meta{color:#7d8ca9;font-size:13px;border-bottom:1px solid #eef1f7;padding-bottom:12px;margin-bottom:6px}
+.paper .paper-qa{margin-top:10px;padding-top:8px;border-top:1px dashed #dfe6f2}
+.paper .qa-q{font-weight:700;color:#0b1220}
+.paper .level-tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:8px}
+.paper .level-basic{background:#e7f2ff;color:#1457d9}
+.paper .level-mid{background:#eafaf2;color:#179863}
+.paper .level-hard{background:#fff3e0;color:#b06000}
+.paper .paper-empty{color:#8a93a6;font-style:italic}
+.paper .check{color:#179863;font-weight:700}
+
+/* 亲和力细节：卡片、空状态 */
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin-bottom:22px}
+.quick-card{
+  display:flex;flex-direction:column;gap:7px;text-align:left;
+  background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 18px;
+  transition:transform .18s,border .18s,box-shadow .2s;color:var(--text);
+}
+.quick-card:hover{transform:translateY(-3px);border-color:rgba(111,183,255,.45);box-shadow:var(--shadow)}
+.quick-card:active{transform:translateY(-1px)}
+.quick-ico{font-size:26px}
+.quick-card b{font-size:15.5px}
+.quick-card span{font-size:12.5px;color:var(--text-muted);line-height:1.5}
+.history-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.history-list li{
+  display:flex;align-items:center;gap:12px;justify-content:space-between;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px 16px;
+}
+.history-list .h-item{display:flex;align-items:center;gap:12px;min-width:0}
+.history-list .h-ico{font-size:20px}
+.history-list .h-txt{min-width:0}
+.history-list .h-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-list .h-meta{font-size:12px;color:var(--text-muted)}
+.history-list .h-actions{display:flex;gap:6px}
+.history-list .h-del{color:var(--text-muted);padding:5px 8px;border-radius:8px;font-size:12px}
+.history-list .h-del:hover{color:var(--danger);background:rgba(255,107,107,.1)}
+.history-list .h-open{color:var(--accent);padding:5px 8px;border-radius:8px;font-size:12px}
+.history-list .h-open:hover{background:rgba(111,183,255,.12)}
+.empty-hint{color:var(--text-muted);font-style:italic;font-size:13.5px}
+
+/* ============ 几何引擎 ============ */
+.geometry-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.geo-canvas-wrap{display:flex;align-items:center;justify-content:center;min-height:320px}
+.geo-canvas-wrap svg{width:auto;height:auto}
+.geo-report{font-size:13.5px;line-height:1.8}
+.geo-report h3{font-size:13px;color:#1457d9;border-bottom:2px solid #e3ecfb;padding-bottom:4px;margin:12px 0 8px}
+.geo-report h3:first-child{margin-top:0}
+.geo-report code{font-family:var(--mono);font-size:12.5px;background:#f2f6fd;padding:2px 6px;border-radius:5px;color:#1457d9}
+.geo-report .vpass{color:#179863;font-weight:800}
+.geo-report .vfail{color:#d23b3b;font-weight:800}
+.geo-report .formula{font-family:var(--mono);display:block;background:#f6f9ff;border-left:3px solid #1457d9;padding:8px 12px;border-radius:6px;margin:6px 0;font-size:13px}
+.geo-model-line{font-family:var(--mono);font-size:12px;color:#111827;margin:3px 0;padding:6px 10px;background:#f6f9ff;border-radius:6px}
+
+/* ============ 抽屉/对话框 ============ */
+.drawer{position:fixed;inset:0;z-index:80;display:flex;justify-content:flex-end}
+.drawer-mask{position:absolute;inset:0;background:rgba(4,8,16,.62);backdrop-filter:blur(3px)}
+.drawer-panel{
+  position:relative;width:min(430px,94vw);height:100%;
+  background:linear-gradient(180deg,var(--panel),var(--canvas-2));
+  border-left:1px solid var(--line);padding:22px;overflow-y:auto;
+  animation:slide .28s ease both;box-shadow:-16px 0 44px rgba(0,0,0,.4);
+}
+@keyframes slide{from{transform:translateX(60px);opacity:.6}to{transform:none;opacity:1}}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer-head h3{font-size:18px;font-weight:800}
+.drawer-body h4{font-size:14.5px;color:var(--accent);margin:16px 0 7px}
+.drawer-body h4.mt{margin-top:26px}
+.drawer-body p{color:var(--text-soft);font-size:13.5px;margin:5px 0}
+.row{display:flex;flex-direction:column;gap:7px;font-weight:600;margin:10px 0 6px}
+.row input{width:100%}
+.api-box{margin-top:12px;border:1px dashed var(--line-strong);border-radius:12px;padding:12px 14px}
+.api-box summary{cursor:pointer;color:var(--accent);font-size:13.5px;font-weight:700}
+.mini-hint{color:var(--text-muted)!important;font-size:12.5px!important}
+.settings-actions{display:flex;gap:10px;margin-top:18px}
+.mt{margin-top:26px}
+
+/* ============ Toast ============ */
+.toast-region{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:10px;z-index:100}
+.toast{
+  background:linear-gradient(180deg,#182744,#101a2e);border:1px solid var(--line-strong);
+  border-left:4px solid var(--success);color:var(--text);border-radius:12px;
+  padding:12px 18px;font-size:13.5px;box-shadow:var(--shadow);max-width:340px;animation:rise .3s ease both;
+}
+.toast-warn{border-left-color:var(--warning)}
+.toast-err{border-left-color:var(--danger)}
+
+/* ============ 响应式 ============ */
+@media (max-width:900px){
+  .topnav{gap:2px}
+  .nav-btn{padding:8px 9px;font-size:11px}
+  .nav-btn svg{width:17px;height:17px}
+  .main{padding:26px 18px 70px}
+  .view-head h2{font-size:23px}
+  .geometry-layout{grid-template-columns:1fr}
+  .paper{padding:26px 24px}
+}
+@media (max-width:640px){
+  :root{--topbar-h:58px}
+  .topbar{padding:0 14px;gap:10px}
+  .brand-sub{display:none}
+  .brand-name{font-size:15px}
+  .brand-mark{width:34px;height:34px;font-size:17px}
+  .topbar-actions #nav-toggle{display:inline-flex}
+  .topnav{
+    position:absolute;top:var(--topbar-h);left:0;right:0;display:none;
+    flex-direction:column;background:var(--canvas-2);border-bottom:1px solid var(--line);
+    padding:10px 14px;gap:4px;box-shadow:var(--shadow);
+  }
+  .topnav.open{display:flex}
+  .nav-btn{flex-direction:row;justify-content:flex-start;gap:10px;padding:11px 12px;font-size:14px}
+  .nav-btn svg{width:18px;height:18px}
+  .topbar-actions .icon-btn#btn-help{display:none}
+  .main{padding:22px 14px 60px}
+  .view-head h2{font-size:21px}
+  .panel{padding:16px;border-radius:16px}
+  .field-row{grid-template-columns:1fr}
+  .quick-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .quick-card{padding:15px 13px}
+  .paper{padding:20px 16px;border-radius:14px}
+  .result-toolbar{align-items:flex-start}
+  .toolbar-actions{width:100%}
+  .toolbar-actions .btn{flex:1}
+  .history-list li{flex-direction:column;align-items:stretch}
+  .history-list .h-actions{justify-content:flex-end}
+  .toast-region{left:14px;right:14px}
+  .toast{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto}
+}
+@media print{
+  .topbar,.topnav,.toolbar-actions,.gen-form,.view-head,.drawer,.toast-region,.skip-link{display:none!important}
+  body{background:#fff}.main{max-width:none;padding:0}
+  .paper{box-shadow:none;border-radius:0;padding:0}
+  .view{display:block!important}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<header class="topbar" id="topbar">
+  <div class="brand" role="banner">
+    <div class="brand-mark" aria-hidden="true">启</div>
+    <div class="brand-text">
+      <span class="brand-name">启课智能教学台</span>
+      <span class="brand-sub">Qike Studio · 教学生成软件</span>
+    </div>
+  </div>
+  <nav class="topnav" id="topnav" aria-label="主导航">
+    <button class="nav-btn is-active" data-view="dashboard" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span>工作台</span>
+    </button>
+    <button class="nav-btn" data-view="lesson">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>
+      <span>课件生成</span>
+    </button>
+    <button class="nav-btn" data-view="interactive">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span>互动课堂</span>
+    </button>
+    <button class="nav-btn" data-view="homework">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg>
+      <span>作业评测</span>
+    </button>
+    <button class="nav-btn" data-view="geometry">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>几何引擎</span>
+    </button>
+  </nav>
+  <div class="topbar-actions">
+    <button class="icon-btn" id="btn-help" aria-label="帮助" title="帮助">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" aria-label="设置" title="设置">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main" class="main" tabindex="-1">
+
+  <!-- ============ 工作台 ============ -->
+  <section class="view" id="view-dashboard" aria-labelledby="dashboard-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker" id="dashboard-title">欢迎回来 👋</p>
+        <h2>今天想生成什么课堂内容？</h2>
+        <p class="view-desc">从教材章节出发，几分钟内得到可编辑、可导出的教学成果。所有内容均按国家课程标准口径生成，起始生成由本地引擎完成，配置大模型 API 后可升级为深度生成。</p>
+      </div>
+    </div>
+    <div class="quick-grid" id="quick-cards">
+      <button class="quick-card" data-goto="lesson">
+        <span class="quick-ico" aria-hidden="true">📗</span>
+        <b>课件生成</b>
+        <span>五环节完整课件，可编辑可导出</span>
+      </button>
+      <button class="quick-card" data-goto="interactive">
+        <span class="quick-ico" aria-hidden="true">🎯</span>
+        <b>互动课堂</b>
+        <span>提问、抢答、随堂测一键生成</span>
+      </button>
+      <button class="quick-card" data-goto="homework">
+        <span class="quick-ico" aria-hidden="true">📝</span>
+        <b>作业评测</b>
+        <span>基础/提升/拓展分层与答案解析</span>
+      </button>
+      <button class="quick-card" data-goto="geometry">
+        <span class="quick-ico" aria-hidden="true">📐</span>
+        <b>几何引擎</b>
+        <span>确定性建模、渲染与验证</span>
+      </button>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>最近生成</h3>
+        <button class="link-btn" id="btn-clear-history" hidden>清空</button>
+      </div>
+      <ul class="history-list" id="history-list">
+        <li class="empty-hint">还没有生成记录。去上面挑一个模块，开始您的第一份课堂成果吧！</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 课件生成 ============ -->
+  <section class="view" id="view-lesson" hidden aria-labelledby="lesson-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">课件生成</p>
+        <h2 id="lesson-title">一节好课，从生成开始</h2>
+        <p class="view-desc">选择学段、学科、教材版本与章节，一键生成含教学目标、情境导入、讲授要点、互动提问、课堂练习与课堂小结的完整课件。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="lesson-form">
+        <div class="field-row">
+          <label>学段<select id="lesson-stage" required></select></label>
+          <label>年级<select id="lesson-grade" required></select></label>
+          <label>学科<select id="lesson-subject" required></select></label>
+          <label>教材版本<select id="lesson-version" required></select></label>
+        </div>
+        <div class="field-row">
+          <label>章节/单元<select id="lesson-chapter" required></select></label>
+          <label>课时主题<input type="text" id="lesson-topic" placeholder="如：分数的初步认识（留空则取章节）"></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit" id="lesson-gen-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            生成课件
+          </button>
+          <span class="hint" id="lesson-hint">本地引擎即时生成 · 约 1 秒</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="lesson-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title" id="lesson-result-title">课件大纲</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="lesson-regen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+            重新生成
+          </button>
+          <button class="btn btn-ghost" id="lesson-print">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            打印/导出
+          </button>
+        </div>
+      </div>
+      <div class="paper" id="lesson-paper"></div>
+    </div>
+  </section>
+
+  <!-- ============ 互动课堂 ============ -->
+  <section class="view" id="view-interactive" hidden aria-labelledby="interactive-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">互动课堂</p>
+        <h2 id="interactive-title">把课堂交还给学生</h2>
+        <p class="view-desc">围绕本节内容生成类型丰富的互动活动：随机提问、抢答、随堂测验、小组任务与游戏化小测，可直接投屏使用。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="interactive-form">
+        <div class="field-row">
+          <label>互动类型<select id="interactive-type" required>
+            <option value="question">随机提问</option>
+            <option value="race">课堂抢答</option>
+            <option value="quiz">随堂测验</option>
+            <option value="group">小组任务</option>
+            <option value="game">游戏化小测</option>
+          </select></label>
+          <label>学段<select id="interactive-stage" required></select></label>
+          <label>学科<select id="interactive-subject" required></select></label>
+        </div>
+        <div class="field-row">
+          <label>本课主题<input type="text" id="interactive-topic" placeholder="如：分数的初步认识（留空则取学科）"></label>
+          <label>题量/题目数<select id="interactive-count">
+            <option value="5">5 题</option>
+            <option value="8">8 题</option>
+            <option value="10" selected>10 题</option>
+            <option value="12">12 题</option>
+          </select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit">生成互动活动</button>
+          <span class="hint">本地引擎即时生成 · 约 1 秒</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="interactive-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">课堂互动包</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="interactive-print">打印/导出</button>
+        </div>
+      </div>
+      <div class="paper" id="interactive-paper"></div>
+    </div>
+  </section>
+
+  <!-- ============ 作业评测 ============ -->
+  <section class="view" id="view-homework" hidden aria-labelledby="homework-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">作业评测</p>
+        <h2 id="homework-title">分层作业，人人有收获</h2>
+        <p class="view-desc">按「基础巩固、能力提升、拓展挑战」三层生成作业，每题附答案解析与评分标准，减轻批改负担、支持分层教学。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="homework-form">
+        <div class="field-row">
+          <label>学段<select id="homework-stage" required></select></label>
+          <label>学科<select id="homework-subject" required></select></label>
+          <label>作业主题<input type="text" id="homework-topic" placeholder="如：分数的加减法（留空则取学科）"></label>
+        </div>
+        <div class="field-row">
+          <label>分层强度<select id="homework-level">
+            <option value="mild" selected>温和分层（7:2:1）</option>
+            <option value="balanced">均衡分层（6:3:1）</option>
+            <option value="steep">强分层（5:3:2）</option>
+          </select></label>
+          <label>总题数<select id="homework-count">
+            <option value="10">10 题</option>
+            <option value="15" selected>15 题</option>
+            <option value="20">20 题</option>
+          </select></label>
+          <label>是否附答案<select id="homework-answer">
+            <option value="yes" selected>附答案与解析</option>
+            <option value="no">仅题目</option>
+          </select></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit">生成分层作业</button>
+          <span class="hint">本地引擎即时生成 · 约 1 秒</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="homework-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">分层作业</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="homework-print">打印/导出</button>
+        </div>
+      </div>
+      <div class="paper" id="homework-paper"></div>
+    </div>
+  </section>
+
+  <!-- ============ 几何引擎 ============ -->
+  <section class="view" id="view-geometry" hidden aria-labelledby="geometry-title">
+    <div class="view-head">
+      <div>
+        <p class="kicker">几何图形引擎</p>
+        <h2 id="geometry-title">符号化建模 · 确定性渲染 · 可验证</h2>
+        <p class="view-desc">用参数描述几何对象，引擎按确定性规则渲染 SVG 图形并运行验证器断言其性质，保证图形与题干一致、可直接用于课件与作业。</p>
+      </div>
+    </div>
+    <div class="panel">
+      <form class="gen-form" id="geometry-form">
+        <div class="field-row">
+          <label>图形类型<select id="geometry-type" required>
+            <option value="triangle">三角形</option>
+            <option value="quad">四边形</option>
+            <option value="circle">圆</option>
+          </select></label>
+          <label>形状设定<select id="geometry-shape">
+            <option value="scalene">任意三角形</option>
+            <option value="right">直角三角形</option>
+            <option value="isosceles">等腰三角形</option>
+            <option value="equilateral">等边三角形</option>
+          </select></label>
+          <label>图形尺寸<input type="number" id="geometry-size" value="220" min="120" max="380" step="10" aria-label="图形尺寸"></label>
+        </div>
+        <div class="gen-actions">
+          <button class="btn btn-primary" type="submit">建模并渲染</button>
+          <span class="hint">确定性引擎 · 验证器随图运行</span>
+        </div>
+      </form>
+    </div>
+    <div class="result-wrap" id="geometry-result" hidden>
+      <div class="result-toolbar">
+        <h3 class="result-title">几何图形与验证报告</h3>
+        <div class="toolbar-actions">
+          <button class="btn btn-ghost" id="geometry-download-svg">下载 SVG</button>
+          <button class="btn btn-ghost" id="geometry-print">打印/导出</button>
+        </div>
+      </div>
+      <div class="geometry-layout">
+        <div class="paper geo-canvas-wrap" id="geometry-canvas"></div>
+        <div class="paper geo-report" id="geometry-report"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 帮助抽屉 ============ -->
+<div class="drawer" id="help-drawer" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+  <div class="drawer-mask" data-close></div>
+  <aside class="drawer-panel">
+    <div class="drawer-head">
+      <h3 id="help-title">帮助中心</h3>
+      <button class="icon-btn" data-close aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <h4>📍 从哪里开始？</h4>
+      <p>先进入「课件生成」挑一个章节试试，满意后再到「互动课堂」「作业评测」补充课堂配套。</p>
+      <h4>⚙️ 生成引擎说明</h4>
+      <p>当前为本地模板引擎：按国家课程标准的结构与常见教学法，从内置素材库中组合生成，断网也能用。</p>
+      <p>在「设置」中填入大模型 API 后，将切换为 API 深度生成，回答更富个性化。</p>
+      <h4>📐 几何引擎怎么用？</h4>
+      <p>选择图形类型、形状与尺寸，引擎会给出 <b>模型 → 渲染 → 验证</b> 三段式结果：SVG 图形 + 边长/角度/性质断言，全部通过标记 ✓。</p>
+      <h4>📄 结果能做什么？</h4>
+      <p>打印/导出为可打印页面；几何图形可单独下载 SVG，直接插入 Word 或课件。</p>
+      <h4>🔒 数据说明</h4>
+      <p>生成历史默认保存在本机浏览器中，可随时清空；不上传任何内容。</p>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ 设置对话框 ============ -->
+<div class="drawer" id="settings-drawer" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+  <div class="drawer-mask" data-close></div>
+  <aside class="drawer-panel">
+    <div class="drawer-head">
+      <h3 id="settings-title">设置</h3>
+      <button class="icon-btn" data-close aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <h4>生成引擎</h4>
+      <label class="row">生成模式
+        <select id="set-engine">
+          <option value="local">本地引擎（默认，离线可用）</option>
+          <option value="api">API 深度生成</option>
+        </select>
+      </label>
+      <details class="api-box">
+        <summary>大模型 API 配置（高级）</summary>
+        <label class="row">接口地址
+          <input type="url" id="set-api-url" placeholder="https://api.openai.com/v1/chat/completions">
+        </label>
+        <label class="row">模型名称
+          <input type="text" id="set-api-model" placeholder="gpt-4o">
+        </label>
+        <label class="row">API Key
+          <input type="password" id="set-api-key" placeholder="sk-...（仅存于本机浏览器）" autocomplete="off">
+        </label>
+        <p class="mini-hint">Key 只保存在本地浏览器中，不随任何请求外发到本软件服务器（本应用无服务器，请求直达你填写的接口）。</p>
+      </details>
+      <div class="settings-actions">
+        <button class="btn btn-primary" id="settings-save">保存设置</button>
+        <button class="btn btn-ghost" id="settings-reset">恢复默认</button>
+      </div>
+      <h4 class="mt">关于</h4>
+      <p class="mini-hint">启课智能教学台 Qike Studio v1.0 · 面向 1–12 年级教师的内容生成软件原型。技术路线对标清华大学开源项目 OpenMAIC，聚焦基础教育场景做可核验的本地化生成。</p>
+      <p class="mini-hint">内容口径依据《义务教育课程标准》《普通高中课程标准》公开框架与主流教材章节结构编排。</p>
+    </div>
+  </aside>
+</div>
+
+<div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+
+
+
+
+
+<script>
+/* ===== app-content.js ===== */
+/* ============================================================
+ * app-content.js · 课程内容结构库
+ * 学段 / 学科 / 教材版本 / 单元章节骨架（课标对齐，公开框架）
+ * ============================================================ */
+window.QIKE_CONTENT = (function () {
+  "use strict";
+
+  const stages = [
+    { id: "primary", name: "小学", range: "1–6 年级", label: "小学（1–6 年级）" },
+    { id: "junior",  name: "初中", range: "7–9 年级", label: "初中（7–9 年级）" },
+    { id: "senior",  name: "高中", range: "10–12 年级", label: "高中（10–12 年级）" },
+  ];
+
+  const subjects = {
+    primary: ["语文", "数学", "英语", "科学", "道德与法治"],
+    junior:  ["语文", "数学", "英语", "物理", "化学", "生物学", "道德与法治", "历史", "地理"],
+    senior:  ["语文", "数学", "英语", "物理", "化学", "生物学", "思想政治", "历史", "地理"],
+  };
+
+  // 教材版本（按学科区分；"统编" 即人民教育出版社统编教材）
+  const versions = {
+    "语文":   ["统编版（人教版）"],
+    "数学":   ["人教版", "北师大版", "苏教版"],
+    "英语":   ["人教PEP版", "外研版（三起点）", "外研版（一起点）"],
+    "科学":   ["教科版", "苏教版"],
+    "道德与法治": ["统编版（人教版）"],
+    "物理":   ["人教版", "北师大版", "苏科版"],
+    "化学":   ["人教版", "鲁教版", "沪教版"],
+    "生物学": ["人教版", "北师大版"],
+    "历史":   ["统编版（人教版）"],
+    "地理":   ["人教版", "湘教版", "中图版"],
+    "思想政治": ["统编版（人教版）"],
+  };
+
+  // 单元骨架：key = 学段-学科，值为 { 年级: [单元/章节...] }，取真实教材公开结构代表性单元
+  const units = {
+    "primary-数学": {
+      "1": ["准备课", "位置", "1~5 的认识和加减法", "认识图形（一）", "6~10 的认识和加减法", "11~20 各数的认识", "认识钟表", "20 以内的进位加法"],
+      "2": ["长度单位", "100 以内的加法和减法（二）", "角的初步认识", "表内乘法（一）", "观察物体（一）", "表内乘法（二）", "认识时间", "数学广角——搭配"],
+      "3": ["时、分、秒", "万以内的加法和减法（一）", "测量", "万以内的加法和减法（二）", "倍的认识", "多位数乘一位数", "长方形和正方形", "分数的初步认识"],
+      "4": ["大数的认识", "公顷和平方千米", "三位数乘两位数", "平行四边形和梯形", "除数是两位数的除法", "条形统计图", "数学广角——优化"],
+      "5": ["小数乘法", "位置", "小数除法", "简易方程", "多边形的面积", "可能性", "数学广角——植树问题"],
+      "6": ["分数乘法", "位置与方向（二）", "分数除法", "比", "圆", "百分数（一）", "扇形统计图", "数学广角——数与形"],
+    },
+    "primary-语文": {
+      "1": ["我上学了", "识字单元（天地人 · 金木水火土）", "汉语拼音", "课文（秋天 · 小小的船）", "口语交际"],
+      "2": ["课文单元（小蝌蚪找妈妈）", "识字单元（场景歌 · 树之歌）", "课文单元（坐井观天）", "课文单元（狐假虎威）", "语文园地"],
+      "3": ["课文单元（大青树下的小学）", "课文单元（铺满金色巴掌的水泥道）", "童话单元（卖火柴的小女孩）", "预测单元（总也倒不了的老屋）", "习作单元"],
+      "4": ["课文单元（观潮）", "提问策略单元（一个豆荚里的五粒豆）", "神话单元（盘古开天地）", "习作单元（麻雀）", "快乐读书吧"],
+      "5": ["课文单元（白鹭）", "课文单元（搭石）", "说明文单元（太阳）", "习作单元（松鼠）", "民间故事单元（猎人海力布）", "快乐读书吧"],
+      "6": ["课文单元（草原）", "课文单元（七律·长征）", "策略单元（竹节人）", "小说单元（桥）", "习作单元（夏天里的成长）", "古诗词诵读"],
+    },
+    "primary-英语": {
+      "3": ["Unit 1 Hello!", "Unit 2 Colours", "Unit 3 Look at me!", "Unit 4 We love animals", "Unit 5 Let's eat!", "Unit 6 Happy birthday!"],
+      "4": ["Unit 1 My classroom", "Unit 2 My schoolbag", "Unit 3 My friends", "Unit 4 My home", "Unit 5 Dinner's ready", "Unit 6 Meet my family"],
+      "5": ["Unit 1 What's he like?", "Unit 2 My week", "Unit 3 What would you like?", "Unit 4 What can you do?", "Unit 5 There is a big bed", "Unit 6 In a nature park"],
+      "6": ["Unit 1 How tall are you?", "Unit 2 Last weekend", "Unit 3 Where did you go?", "Unit 4 Then and now", "Unit 5 What does he do?", "Unit 6 How do you feel?"],
+    },
+    "primary-科学": {
+      "1": ["我们周围的物体", "比较与测量"],
+      "2": ["我们的地球家园", "材料", "周围的水", "天气"],
+      "3": ["水", "空气", "天气", "物体的运动", "太阳、地球和月球"],
+      "4": ["声音", "电路", "运动和力", "岩石与土壤"],
+      "5": ["光", "地球表面的变化", "计量时间", "健康生活"],
+      "6": ["微小世界", "地球的运动", "工具与技术", "能量"],
+    },
+    "primary-道德与法治": {
+      "1": ["我是小学生啦", "校园生活真快乐", "家中的安全与健康", "我们做朋友"],
+      "2": ["我们的节假日", "我们的班级", "我们在公共场所", "我们生活的地方"],
+      "3": ["快乐学习", "我们的学校", "安全护我成长", "家是最温暖的地方"],
+      "4": ["与班级共成长", "为父母分担", "信息万花筒", "让生活多一些绿色"],
+      "5": ["面对成长中的新问题", "我们是班级的主人", "我们的国土 我们的家园", "骄人祖先 灿烂文化"],
+      "6": ["我们是公民", "我们的守护者", "我们的国家机构", "法律保护我们健康成长"],
+    },
+    "junior-数学": {
+      "7": ["有理数", "整式的加减", "一元一次方程", "几何图形初步", "相交线与平行线", "实数", "平面直角坐标系", "二元一次方程组"],
+      "8": ["三角形", "全等三角形", "轴对称", "整式的乘法与因式分解", "分式", "二次根式", "勾股定理", "平行四边形", "一次函数"],
+      "9": ["一元二次方程", "二次函数", "旋转", "圆", "概率初步", "反比例函数", "相似", "锐角三角函数", "投影与视图"],
+    },
+    "junior-语文": {
+      "7": ["第一单元（四季景致）", "第二单元（至爱亲情）", "文言文单元", "第三单元（学习生活）", "古诗文诵读", "活动·探究（新闻）"],
+      "8": ["新闻单元（消息·通讯）", "回忆性散文单元", "说明文单元", "演讲单元", "游记单元", "文言文单元"],
+      "9": ["现代诗单元", "议论文单元", "小说单元", "戏剧单元", "古诗词单元", "文言文单元"],
+    },
+    "junior-英语": {
+      "7": ["Starter Units", "Unit 1 My name's Gina", "Unit 2 This is my sister", "Unit 3 Is this your pencil?", "Unit 4 Where's my schoolbag?", "Unit 5 Do you have a soccer ball?", "Unit 9 My favorite subject is science"],
+      "8": ["Unit 1 Where did you go on vacation?", "Unit 2 How often do you exercise?", "Unit 3 I'm more outgoing than my sister", "Unit 4 What's the best movie theater?", "Unit 5 Do you want to watch a game show?", "Unit 6 I'm going to study computer science"],
+      "9": ["Unit 1 How can we become good learners?", "Unit 2 I think that mooncakes are delicious!", "Unit 3 Could you please tell me where the restrooms are?", "Unit 4 I used to be afraid of the dark", "Unit 5 What are the shirts made of?", "Unit 6 When was it invented?"],
+    },
+    "junior-物理": {
+      "8": ["机械运动", "声现象", "物态变化", "光现象", "透镜及其应用", "质量与密度", "力", "运动和力", "压强", "浮力"],
+      "9": ["内能", "内能的利用", "电流和电路", "电压 电阻", "欧姆定律", "电功率", "生活用电", "电与磁", "信息的传递", "能源与可持续发展"],
+    },
+    "junior-化学": {
+      "9": ["走进化学世界", "我们周围的空气", "物质构成的奥秘", "自然界的水", "化学方程式", "碳和碳的氧化物", "燃料及其利用", "金属和金属材料", "溶液", "酸和碱", "盐 化肥"],
+    },
+    "junior-生物学": {
+      "7": ["生物和生物圈", "生物体的结构层次", "生物圈中的绿色植物", "生物圈中的人"],
+      "8": ["动物的主要类群", "动物的运动和行为", "生物圈中的其他生物", "生物的多样性及其保护", "生物圈中生命的延续和发展", "健康地生活"],
+    },
+    "junior-道德与法治": {
+      "7": ["成长的节拍", "友谊的天空", "师长情谊", "生命的思考", "青春时光", "做情绪情感的主人", "在集体中成长", "走进法治天地"],
+      "8": ["坚持宪法至上", "理解权利义务", "人民当家作主", "崇尚法治精神", "维护国家利益", "遵守社会规则", "勇担社会责任"],
+      "9": ["富强与创新", "民主与法治", "文明与家园", "和谐与梦想", "我们共同的世界", "世界舞台上的中国", "走向未来的少年"],
+    },
+    "junior-历史": {
+      "7": ["史前时期：中国境内早期人类与文明的起源", "夏商周时期：早期国家与社会变革", "秦汉时期：统一多民族国家的建立和巩固", "三国两晋南北朝时期：政权分立与民族交融", "隋唐时期：繁荣与开放的时代", "辽宋夏金元时期：民族关系发展和社会变化", "明清时期：统一多民族国家的巩固与发展"],
+      "8": ["中国开始沦为半殖民地半封建社会", "近代化的早期探索与民族危机的加剧", "资产阶级民主革命与中华民国的建立", "新民主主义革命的开始", "从国共合作到国共对立", "中华民族的抗日战争", "人民解放战争", "近代经济、社会生活与教育文化事业的发展"],
+      "9": ["古代亚非文明", "古代欧洲文明", "封建时代的欧洲", "封建时代的亚洲国家", "走向近代", "资本主义制度的初步确立", "工业革命和工人运动的兴起", "殖民地人民的反抗与资本主义制度的扩展", "第一次世界大战和战后初期的世界", "经济大危机和第二次世界大战", "冷战和美苏对峙的世界", "当代世界的发展与挑战"],
+    },
+    "junior-地理": {
+      "7": ["地球和地图", "陆地和海洋", "天气与气候", "居民与聚落", "发展与合作", "我们生活的大洲——亚洲", "我们邻近的地区和国家", "东半球其他的地区和国家", "西半球的国家", "极地地区"],
+      "8": ["从世界看中国", "中国的自然环境", "中国的自然资源", "中国的经济发展", "中国的地理差异", "北方地区", "南方地区", "西北地区", "青藏地区", "中国在世界中"],
+    },
+    "senior-数学": {
+      "10": ["集合与常用逻辑用语", "一元二次函数、方程和不等式", "函数的概念与性质", "指数函数与对数函数", "三角函数", "平面向量及其应用", "复数", "立体几何初步", "统计与概率"],
+      "11": ["空间向量与立体几何", "直线和圆的方程", "圆锥曲线的方程", "数列", "一元函数的导数及其应用", "计数原理", "随机变量及其分布", "成对数据的统计分析"],
+      "12": ["函数、导数与不等式综合", "解析几何综合", "立体几何综合", "概率统计综合", "数列综合", "微专题复习"],
+    },
+    "senior-语文": {
+      "10": ["必修上册（青春激扬）", "必修上册（劳动光荣）", "必修上册（生命的诗意——古诗词）", "必修上册（我们的家园）", "必修上册（乡土中国·整本书阅读）", "必修上册（学习之道）", "必修上册（词语积累与梳理）", "必修上册（古诗词诵读）"],
+      "11": ["选择性必修（科学与文化）", "选择性必修（苦难与新生）", "选择性必修（革命历程）", "选择性必修（逻辑的力量）", "选择性必修（中国传统文化）", "选择性必修（外国作家作品研习）"],
+      "12": ["复习专题：现代文阅读", "复习专题：古诗文阅读", "复习专题：语言文字运用", "复习专题：写作", "整本书阅读与研讨"],
+    },
+    "senior-英语": {
+      "10": ["必修一 Welcome Unit", "必修一 Unit 1 Teenage Life", "必修一 Unit 2 Travelling Around", "必修一 Unit 3 Sports and Fitness", "必修一 Unit 4 Natural Disasters", "必修一 Unit 5 Languages Around the World"],
+      "11": ["选择性必修一 Unit 1 People of Achievement", "选择性必修一 Unit 2 Looking into the Future", "选择性必修一 Unit 3 Fascinating Parks", "选择性必修一 Unit 4 Body Language", "选择性必修一 Unit 5 Working the Land", "选择性必修二 Unit 1 Science and Scientists"],
+      "12": ["语法专项复习", "话题阅读训练", "应用文写作", "读后续写训练", "完形填空与语篇填空"],
+    },
+    "senior-物理": {
+      "10": ["运动的描述", "匀变速直线运动的研究", "相互作用——力", "运动和力的关系", "抛体运动", "圆周运动", "万有引力与宇宙航行", "机械能守恒定律"],
+      "11": ["静电场", "电路及其应用", "电能 能量守恒定律", "磁场", "电磁感应", "交变电流", "电磁振荡与电磁波", "传感器"],
+      "12": ["动量守恒定律", "机械振动", "机械波", "光", "原子结构和波粒二象性", "原子核", "综合复习专题"],
+    },
+    "senior-化学": {
+      "10": ["物质及其变化", "海水中的重要元素——钠和氯", "铁 金属材料", "物质的量", "物质结构 元素周期律", "化学反应与能量", "有机化合物", "化学与可持续发展"],
+      "11": ["化学反应的热效应", "化学反应速率与化学平衡", "水溶液中的离子反应与平衡", "化学反应与电能", "认识有机化合物", "烃", "烃的衍生物", "生物大分子", "合成高分子"],
+      "12": ["化学实验基础", "物质结构与性质专题", "有机化学基础专题", "化学反应原理专题", "综合模拟训练"],
+    },
+    "senior-生物学": {
+      "10": ["走近细胞", "组成细胞的分子", "细胞的基本结构", "细胞的物质输入和输出", "细胞的能量供应和利用", "细胞的生命历程"],
+      "11": ["遗传因子的发现", "基因和染色体的关系", "基因的本质", "基因的表达", "基因突变及其他变异", "生物的进化", "人体的内环境与稳态", "神经调节", "体液调节", "免疫调节"],
+      "12": ["植物生命活动的调节", "种群及其动态", "群落及其演替", "生态系统及其稳定性", "人与环境", "生物技术与工程", "综合复习专题"],
+    },
+    "senior-思想政治": {
+      "10": ["中国特色社会主义", "生产资料所有制与经济体制", "经济发展与社会进步", "中国共产党的领导", "人民当家作主", "全面依法治国"],
+      "11": ["探索认识的奥秘", "寻觅社会的真谛", "把握世界的规律", "文化的传承与创新", "文化的民族性与多样性", "联系、矛盾与发展的观点专题"],
+      "12": ["当代国际政治与经济", "法律与生活", "逻辑与思维", "综合复习专题"],
+    },
+    "senior-历史": {
+      "10": ["中外历史纲要（上）：从中华文明起源到秦汉大一统", "三国两晋南北朝与隋唐盛世", "辽宋夏金元时期", "明清时期", "晚清时期的内忧外患与救亡图存", "辛亥革命与北洋军阀的统治", "新民主主义革命", "中华人民共和国成立和社会主义革命与建设", "改革开放与社会主义现代化建设新时期"],
+      "11": ["中外历史纲要（下）：古代文明的产生与发展", "中古时期的世界", "走向整体的世界", "资本主义制度的确立", "工业革命与马克思主义的诞生", "世界殖民体系与亚非拉民族独立运动", "两次世界大战", "20 世纪下半叶世界的新变化", "当代世界发展的特点与主要趋势"],
+      "12": ["选择性必修：国家制度与社会治理", "选择性必修：经济与社会生活", "选择性必修：文化交流与传播", "综合复习专题"],
+    },
+    "senior-地理": {
+      "10": ["宇宙中的地球", "地球上的大气", "地球上的水", "地貌", "植被与土壤", "自然灾害", "人口", "乡村和城镇", "产业区位因素", "交通运输布局与区域发展"],
+      "11": ["自然环境与人类社会", "资源安全与国家安全", "环境安全与国家安全", "区域与区域发展", "资源环境与区域发展", "城市、产业与区域发展", "区际联系与区域协调发展"],
+      "12": ["区域发展专题", "资源、环境与国家安全专题", "地理实践与综合复习"],
+    },
+  };
+
+  // 兼容查询：key 不存在时回退。
+  function uniq(arr) { return Array.from(new Set(arr)); }
+  function getSubjects(stageId) { return subjects[stageId] || []; }
+  function getVersionsFor(subject) { return versions[subject] || ["人教版"]; }
+  function getUnits(stageId, subject, grade) {
+    const key = stageId + "-" + subject;
+    const g = String(grade);
+    const bucket = units[key];
+    if (!bucket) return [];
+    return bucket[g] || [];
+  }
+  function getUnitGrades(stageId, subject) {
+    const key = stageId + "-" + subject;
+    const bucket = units[key];
+    return bucket ? Object.keys(bucket).sort((a, b) => Number(a) - Number(b)) : [];
+  }
+
+  return {
+    stages, subjects, versions, units,
+    getSubjects, getVersionsFor, getUnits, getUnitGrades, uniq,
+  };
+})();
+/* ===== app-data.js ===== */
+/* ============================================================
+ * app-data.js · 学科素材库与教学法模板
+ * 供本地生成引擎组合出专业、亲和的教学内容
+ * ============================================================ */
+window.QIKE_DATA = (function () {
+  "use strict";
+
+  // ---------- 通用教学法素材 ----------
+  const pedagogy = {
+    bloomVerbs: {
+      base: ["说出", "辨认", "列举", "复述", "描述", "指认", "读出"],
+      mid: ["解释", "概括", "区别", "分析", "举例说明", "比较", "整理"],
+      high: ["应用", "设计", "评价", "论证", "迁移运用", "综合", "创造"],
+    },
+    lessonObjectives: {
+      know: "理解并掌握本节核心知识，能准确表述基本概念与规律",
+      apply: "能在具体情境中正确应用本节知识解决问题",
+      think: "经历观察、猜想、验证的过程，发展逻辑推理与数学/科学思维",
+      affect: "在课堂活动中感受知识的实际价值，增强学习兴趣与自信心",
+    },
+    sceneOpeners: [
+      "从一个贴近生活的真实情境出发，让学生先说“我看到/我想到/我好奇什么”，再顺势引出课题",
+      "播放一段 30 秒的短视频或图片情境，请学生用一句话概括画面中的数学（科学/语文）元素",
+      "抛出与本课有关的“反常识”问题，制造认知冲突，激发解决问题的愿望",
+      "回顾上一节内容，用“上节课我们认识了……，今天要解决一个更难的问题”自然衔接",
+      "把课题变成一个小任务：如果你是设计师/小记者/研究员，你会怎么做？",
+    ],
+    transitions: [
+      "看来大家已经有了初步想法，我们再来看看它背后的道理。",
+      "这个发现很有意思，谁能把它的本质再说得更清楚一些？",
+      "接下来请同桌合作，用 2 分钟时间验证一下这个猜想。",
+      "让我们把刚才的结论用规范的语言记录下来。",
+      "带着这个新工具，回到开始时的问题，你发现什么变化了吗？",
+    ],
+    closers: [
+      "请每位同学用一句话总结今天最大的收获，同桌互相听听。",
+      "出示一道“今天的知识卡片”小练，检验本节目标达成情况。",
+      "布置分层课后练习，并鼓励学有余力的同学挑战拓展题。",
+      "预告下一节内容，留下一个值得思考的悬念问题。",
+    ],
+    praise: [
+      "思路非常清晰，奖励一颗“思维星”！",
+      "这位同学敢于说出自己的方法，勇气可嘉！",
+      "你们小组的合作特别高效，分工明确！",
+      "能从不同角度思考，这就是深度学习的样子！",
+      "出错不可怕，发现错误本身就是一次学习！",
+    ],
+  };
+
+  // ---------- 学科素材（按学科聚合） ----------
+  // 每个学科：concepts 概念池；openers 导入情境；points 讲授要点；
+  // questions 提问模板（{q, a}）；practices 课堂练习模板；
+  // hw 作业模板（basic/up/advance）；interacts 互动活动模板
+  const subjects = {
+    语文: {
+      concepts: [
+        "把握文章的主要内容", "体会关键句表情达意的作用", "有感情地朗读课文", "积累课文中优美的词句",
+        "了解文章的表达顺序", "体会说明方法及其作用", "品析人物形象", "感受修辞手法的表达效果",
+        "借助注释与工具书理解文言文", "把握诗歌的意象与情感", "梳理文章脉络", "学习作者观察与描写的方法",
+      ],
+      examPoints: ["按要求概括段落大意", "仿写比喻句/排比句", "联系上下文理解词语含义", "朗读并背诵经典片段", "缩写/扩写句子", "文言字词释义与翻译"],
+      questions: [
+        { q: "课文主要写了什么？请用“谁—做了什么—结果怎样”的句式说清楚。", a: "点拨：抓人物、事件、结果三要素，讲求语言简洁完整。" },
+        { q: "作者为什么这样开头？这样写有什么好处？", a: "点拨：从“设置悬念、奠定基调、引出下文”等角度作答。" },
+        { q: "文中哪个句子最打动你？读出来，并说说理由。", a: "点拨：鼓励结合自身生活体验谈感受。" },
+        { q: "如果把结尾改写一下，你会怎么写？", a: "点拨：允许个性表达，强调理由充分、逻辑自洽。" },
+        { q: "本文用了哪些修辞手法？分别有什么表达效果？", a: "点拨：比喻、拟人、排比、夸张等，效果围绕“生动形象、突出强调”。" },
+      ],
+      practices: [
+        "给下列词语选择正确的解释，并造一个句子。",
+        "读句子，体会加点词语的表达效果。",
+        "把下面的句子改写成比喻句/拟人句。",
+        "结合课文内容，补全下面的思维导图。",
+        "给同伴讲一讲：如果你是文中的主人公，你会怎么做？",
+      ],
+      hw: [
+        { basic: "抄写并默写本课生字词；有感情地朗读课文 3 遍。", up: "完成课后练习，用思维导图梳理课文结构。", adv: "联系生活写一段 100 字左右的读后感。" },
+        { basic: "根据拼音书写词语，标注易错字的读音。", up: "仿照课文句式写一个排比段。", adv: "选择文中一位人物，写一段 150 字的“人物小传”。" },
+        { basic: "背诵并默写指定段落。", up: "用“先…接着…然后…”的句式复述课文内容。", adv: "为一篇同类文章设计一张阅读任务单。" },
+      ],
+      interacts: [
+        { t: "朗读接龙", desc: "每人读一句接龙，接错的同学要说出一个本课好词。", use: "课文朗读环节" },
+        { t: "金句对对碰", desc: "找出文中你最喜欢的一句话，与同桌交换，并互相点评。", use: "品词析句环节" },
+        { t: "思维导图接力", desc: "按小组轮流补充课文结构图的一个分支。", use: "整体感知环节" },
+        { t: "小作家擂台", desc: "用本课所学写法即兴创作一句话，全班投票“最佳金句”。", use: "写作迁移环节" },
+        { t: "接龙复述", desc: "小组内轮流复述故事情节，一人一句，看哪组讲得最完整。", use: "复习巩固环节" },
+      ],
+    },
+    数学: {
+      concepts: [
+        "数的认识与运算", "常见的量", "运算律", "图形的认识与测量", "图形的位置与运动",
+        "统计与概率", "方程与不等式", "函数概念与图像", "几何推理与证明", "数学建模与解决问题",
+      ],
+      examPoints: ["口算/笔算", "简便运算", "解方程/方程应用", "几何面积体积计算", "统计图表分析", "实际应用问题"],
+      questions: [
+        { q: "这道题你是怎样想的？先说说你的思路，再动笔。", a: "点拨：鼓励先讲思路后解答，暴露思维过程。" },
+        { q: "还有不同的解法吗？比一比哪种更简便？", a: "点拨：多解对比，突出优化意识。" },
+        { q: "算错了没关系，你能从结果猜到错在哪一步吗？", a: "点拨：错例分析，培养检查与验算习惯。" },
+        { q: "把题目中的条件减少一个，还能求出结果吗？", a: "点拨：变式训练，加深对条件与结论关系的理解。" },
+        { q: "你能编一道用“比例/方程”解决的同类问题吗？", a: "点拨：反向命题，实现知识迁移。" },
+      ],
+      practices: [
+        "口算天天练：每组 5 题，限时 1 分钟。",
+        "用两种方法解答，并说说哪种方法更优。",
+        "先估一估，再笔算，最后用估算检验答案是否合理。",
+        "找一找生活中的【主题】，把数据记录下来并解决一个问题。",
+        "根据统计图（表）提两个数学问题。",
+      ],
+      hw: [
+        { basic: "基础计算：完成本课对应口算与笔算题；理解并背诵概念定义。", up: "综合应用：完成课本“练习”中思维含量较高的题目，书写完整过程。", adv: "拓展挑战：自编一道与本课相关的生活应用题并解答，附解题思路。" },
+        { basic: "巩固概念：判断、选择、填空类基础题组。", up: "列式解答：解决 2 道两步计算实际问题，写出数量关系。", adv: "探究任务：写出“用字母表示数”的小研究报告（一页纸）。" },
+        { basic: "完成教材基础练习，要求书写规范、验算检查。", up: "完成变式练习，总结所用公式或方法。", adv: "数学日记：记录今天用数学解决的一个真实问题。" },
+      ],
+      interacts: [
+        { t: "口算擂台", desc: "两组抢答口算，答对为本组加一分，限时 5 分钟。", use: "课始热身" },
+        { t: "找茬小分队", desc: "出示含错误过程的解题卡，小组找出错误步骤并改正。", use: "易错点辨析" },
+        { t: "一题多解", desc: "每人写一种解法，全班汇总后归纳最优方法。", use: "新授深化" },
+        { t: "数学诊所", desc: "扮演“医生”，给错题写“诊断书”（错因+处方）。", use: "练习讲评" },
+        { t: "我来当小老师", desc: "抽签请同学上讲台讲题，台下同学补充或质疑。", use: "复习巩固" },
+      ],
+    },
+    英语: {
+      concepts: [
+        "语音与拼读规则", "核心词汇与句型", "语法项目（时态/语态/从句）", "话题交际功能", "阅读理解策略",
+        "书面表达结构", "听力信息获取", "文化意识与跨文化交际",
+      ],
+      examPoints: ["单词拼写与变形", "单项选择", "情景交际", "完形填空", "阅读理解", "书面表达"],
+      questions: [
+        { q: "Who can read this sentence? Pay attention to the pronunciation.", a: "点拨：关注重音与连读，先跟读再自读。" },
+        { q: "Can you make a new sentence with this pattern?", a: "点拨：鼓励替换关键词造句，人人开口。" },
+        { q: "What does this word mean in this sentence?", a: "点拨：结合语境猜测词义，而非只查词典。" },
+        { q: "What's your favorite ... and why?", a: "点拨：用目标句型表达观点并说明理由。" },
+        { q: "Can you find the key sentence of this passage?", a: "点拨：训练定位主题句的阅读策略。" },
+      ],
+      practices: [
+        "Listen and repeat: 听音跟读本课句型。",
+        "Pair work: 用目标句型做两两对话练习。",
+        "Fill in the blanks: 补全对话。",
+        "Role play: 分角色表演对话。",
+        "Memory game: 快速记忆并复述本课词汇。",
+      ],
+      hw: [
+        { basic: "听录音跟读课文 3 遍，抄写并记忆核心词汇。", up: "用本课句型编写 3 个新对话小场景。", adv: "写一篇 5-8 句的短文介绍自己/家人/学校。" },
+        { basic: "完成词汇与句型基础练习。", up: "朗读并翻译课文，标出重点句型。", adv: "阅读一篇同主题短文，回答 3 个问题。" },
+        { basic: "背诵核心句型并默写。", up: "完成语法专项练习（单项选择/填空）。", adv: "用思维导图整理本单元词汇并按话题输出一段话。" },
+      ],
+      interacts: [
+        { t: "单词闪电战", desc: "出示中文/图片，学生抢答英文，答对得分。", use: "词汇复习" },
+        { t: "对话表演赛", desc: "小组创编并表演对话，评选“最佳表演组”。", use: "句型操练" },
+        { t: "我来问你来答", desc: "一个同学用目标句型提问，任意点人回答。", use: "句型操练" },
+        { t: "听力小达人", desc: "听一段对话，完成信息填空，全对加分。", use: "听力训练" },
+        { t: "Spelling Bee", desc: "拼写大赛：老师报词，学生口头拼写。", use: "词汇巩固" },
+      ],
+    },
+    物理: {
+      concepts: [
+        "物质的三态变化", "声音的产生与传播", "光的反射与折射", "透镜成像规律", "力与运动的关系",
+        "压强与浮力", "简单机械与功", "电流与电路", "欧姆定律", "电功率", "磁场与电磁感应", "能量转化与守恒",
+      ],
+      examPoints: ["概念辨析", "实验探究题", "作图题", "计算题（公式应用）", "估测题", "联系实际的分析题"],
+      questions: [
+        { q: "生活中有哪些现象体现了这一规律？请举一个例子。", a: "点拨：物理源于生活，鼓励用生活经验解释物理。" },
+        { q: "如果……发生变化，结果会怎样？", a: "点拨：控制变量法思考，养成条件意识。" },
+        { q: "这个实验的变量是什么？怎样控制？", a: "点拨：明确实验设计的三要素：变量、控制、测量。" },
+        { q: "请用能量守恒的观点解释这个现象。", a: "点拨：从“能量从哪来、到哪去、是否转化”回答。" },
+        { q: "你的估算依据是什么？大胆猜，再验证。", a: "点拨：培养数量级估测能力。" },
+      ],
+      practices: [
+        "观察并描述一个生活中的【主题】现象。",
+        "完成实验方案设计：写出实验目的、器材、步骤。",
+        "用公式计算并写出完整的解题过程（已知/求/解/答）。",
+        "解释现象：用物理知识说明某个生活场景。",
+        "画出示意图或光路图。",
+      ],
+      hw: [
+        { basic: "完成概念填空与选择，熟记定义与公式。", up: "完成 3 道计算题，规范书写已知、求、解、答。", adv: "设计一个小实验验证本节规律，写出方案与预期结果。" },
+        { basic: "识记本课物理量与单位。", up: "完成课本课后练习，标注考查的知识点。", adv: "写一份“生活中的物理”观察记录（3 个现象+解释）。" },
+        { basic: "完成基础题组。", up: "完成实验题，说出每个步骤的目的。", adv: "开放题：提出一个可探究的问题并设计初步方案。" },
+      ],
+      interacts: [
+        { t: "现象猜猜猜", desc: "看视频/演示实验猜结果，再动手验证。", use: "新授课引入" },
+        { t: "实验设计师", desc: "小组讨论实验方案，全班点评变量控制。", use: "实验探究" },
+        { t: "物理大转盘", desc: "转盘抽题，答题并讲清道理。", use: "复习课" },
+        { t: "工程师挑战", desc: "用所学知识解决一个实际问题，比方案。", use: "应用拓展" },
+      ],
+    },
+    化学: {
+      concepts: [
+        "物质的变化与性质", "混合物与纯净物", "元素与元素符号", "化学式与化合价", "质量守恒定律",
+        "化学方程式", "碳的氧化物", "金属活动性顺序", "溶液与溶解度", "酸碱盐的性质", "化学反应类型",
+      ],
+      examPoints: ["化学用语书写", "实验现象描述", "方程式配平", "推断题", "实验方案评价", "计算题"],
+      questions: [
+        { q: "这个反应属于哪一类化学反应？依据是什么？", a: "点拨：从化合价变化/反应前后物质类别判断。" },
+        { q: "实验中你观察到了什么现象？说明了什么？", a: "点拨：现象描述要规范：色、态、热、味、沉淀、气体。" },
+        { q: "为什么必须控制这个条件？不加会怎样？", a: "点拨：从反应原理和安全角度分析。" },
+        { q: "如何鉴别这两种物质？设计一个方案。", a: "点拨：依据性质差异设计操作、现象、结论三步。" },
+        { q: "这个方程式配平了吗？检验一下。", a: "点拨：检查原子守恒与电荷守恒。" },
+      ],
+      practices: [
+        "写出指定物质的化学式并说出其读法。",
+        "配平下列化学方程式。",
+        "描述一个演示实验的现象并写出化学方程式。",
+        "根据物质性质，完成鉴别方案设计。",
+        "化学反应类型判断训练。",
+      ],
+      hw: [
+        { basic: "默写元素符号与化合价，完成化学用语基础题。", up: "配平方程式并完成反应类型的判断题组。", adv: "设计一个家庭小实验或推断题，并附完整解答。" },
+        { basic: "完成概念辨析选择填空。", up: "完成课本实验题，规范书写现象与结论。", adv: "用质量守恒定律解释一个日常生活现象。" },
+        { basic: "基础练习：化学式、化合价。", up: "综合练习：方程式计算题 2 道。", adv: "开放探究：设计实验鉴别一杯未知液体的酸碱性。" },
+      ],
+      interacts: [
+        { t: "化学用语接力", desc: "接龙写出元素符号/化学式，错者出局。", use: "课堂热身" },
+        { t: "现象描述大赛", desc: "看实验视频，比赛谁的现象描述最规范完整。", use: "实验讲评" },
+        { t: "鉴别方案 PK", desc: "小组出鉴别方案，互相找漏洞、补完善。", use: "物质性质" },
+        { t: "方程式擂台", desc: "限时配平抢答，检验原子守恒。", use: "方程式训练" },
+      ],
+    },
+    生物学: {
+      concepts: [
+        "生物与环境", "细胞的结构与功能", "绿色植物的光合作用与呼吸作用", "人体的消化呼吸循环", 
+        "遗传与变异", "生物的进化", "生态系统与生物多样性", "免疫与健康", "生物技术与工程",
+      ],
+      examPoints: ["概念辨析", "结构图识别", "实验探究（对照）", "资料分析", "遗传图解", "联系生活分析"],
+      questions: [
+        { q: "这个结构有什么功能？与它的形态有关吗？", a: "点拨：结构与功能相适应的观念。" },
+        { q: "实验中的对照组和实验组分别是什么？", a: "点拨：识别单一变量与对照原则。" },
+        { q: "如果缺少了这一环节，生态系统中会发生什么？", a: "点拨：从物质循环与能量流动链条推演。" },
+        { q: "你能用遗传图解解释这个现象吗？", a: "点拨：规范书写亲代、配子、子代基因型与表现型。" },
+        { q: "生活中还有哪些现象可以说明这一原理？", a: "点拨：联系生活，学以致用。" },
+      ],
+      practices: [
+        "观察并绘制结构示意图，标注各部分名称。",
+        "设计一个对照实验方案。",
+        "分析一段资料，回答相关问题。",
+        "完成遗传图解的书写与推断。",
+        "用概念图整理本节知识网络。",
+      ],
+      hw: [
+        { basic: "识记核心概念，完成基础选择填空。", up: "完成结构图识别与资料分析题。", adv: "小课题：观察记录一周内的生物现象并写分析报告。" },
+        { basic: "完成概念题组。", up: "完成实验探究题，明确变量与结论。", adv: "用概念图展示一个章节的知识体系。" },
+        { basic: "基础题：结构与功能对应。", up: "综合题：生态系统食物网分析。", adv: "开放题：设计家庭养绿植的方案并说明科学依据。" },
+      ],
+      interacts: [
+        { t: "结构猜猜看", desc: "出示结构图/显微照片，抢答名称与功能。", use: "结构学习" },
+        { t: "对照实验审判庭", desc: "评价几个实验设计，指出变量控制是否合理。", use: "实验探究" },
+        { t: "食物链接龙", desc: "接龙说出食物链，接错重新开始。", use: "生态部分" },
+        { t: "健康小顾问", desc: "结合免疫与健康知识给“小病人”开健康处方。", use: "应用拓展" },
+      ],
+    },
+    历史: {
+      concepts: [
+        "早期文明与起源", "统一多民族国家的建立与巩固", "民族交融", "繁荣与开放的时代", "近代化探索",
+        "新民主主义革命", "抗日战争与解放战争", "世界古代文明", "近代资本主义发展", "两次世界大战", "冷战格局", "当代世界格局",
+      ],
+      examPoints: ["时空观念（年代与地图）", "史料实证", "历史解释", "事件因果分析", "人物评价", "材料论述题"],
+      questions: [
+        { q: "这一事件发生的背景是什么？", a: "点拨：从政治、经济、社会、思想多角度分析。" },
+        { q: "结合材料，谈谈你对这一历史事件的看法。", a: "点拨：史论结合，先观点后论据。" },
+        { q: "这一事件与上一课所学事件有怎样的联系？", a: "点拨：建立时序与因果链条。" },
+        { q: "如果用一个词概括这个时代，你会选什么？为什么？", a: "点拨：提炼时代特征，训练历史解释。" },
+        { q: "地图上标注的位置说明了什么？", a: "点拨：落实时空观念，图文互证。" },
+      ],
+      practices: [
+        "绘制时间轴，标出重要事件。",
+        "根据材料概括某一历史事件的原因与影响。",
+        "评价历史人物（用辩证的视角）。",
+        "完成地图填图并说明地理环境的影响。",
+        "撰写一段 80 字左右的“历史小论文”。",
+      ],
+      hw: [
+        { basic: "完成时间轴与基础选择题。", up: "材料题：分析事件背景与影响。", adv: "小论文：围绕主题写一段 150 字的史论结合短文。" },
+        { basic: "识记重要事件的时间与人物。", up: "完成因果分析题。", adv: "绘制本单元的思维导图（含时间、人物、事件、影响）。" },
+        { basic: "基础题组。", up: "史料研读：概括材料观点并评析。", adv: "主题探究：选择一个历史人物，写一篇 200 字的人物小传。" },
+      ],
+      interacts: [
+        { t: "时间轴接力", desc: "每人贴一个事件到时间轴，说清时间和意义。", use: "复习梳理" },
+        { t: "历史辩论赛", desc: "给出开放议题，正反方各 3 分钟立论。", use: "观点表达" },
+        { t: "角色扮演", desc: "扮演历史人物，接受全班“记者”采访。", use: "情境教学" },
+        { t: "年代大冲关", desc: "抢答年代与事件对应，答对前进。", use: "趣味巩固" },
+      ],
+    },
+    地理: {
+      concepts: [
+        "地球与地球仪", "地图的阅读", "世界海陆分布", "天气与气候", "世界的人口、聚落与发展", "中国的自然环境",
+        "中国的自然资源", "中国的经济发展", "区域地理（北方/南方/西北/青藏）", "自然环境与人类社会", "区域协调发展",
+      ],
+      examPoints: ["经纬网定位", "等高线判读", "气候类型与分布", "区域特征分析", "图表判读", "人地关系分析"],
+      questions: [
+        { q: "从地图上你读到了哪些信息？", a: "点拨：培养读图习惯：图例、比例尺、方向、分布。" },
+        { q: "这个地方的气候有什么特点？为什么？", a: "点拨：从纬度、海陆、地形角度综合分析。" },
+        { q: "如果降水量发生变化，这里的人们生活会受到什么影响？", a: "点拨：人地关系，区域影响推演。" },
+        { q: "比较两个区域的自然与人文特征异同。", a: "点拨：列表比较，条理清晰。" },
+        { q: "作为本地规划师，你会如何开发利用这里的资源？", a: "点拨：区域发展观与因地制宜。" },
+      ],
+      practices: [
+        "读图填图：标注主要地理事物。",
+        "根据等高线图判断地形部位。",
+        "气候资料分析：判读气温曲线与降水柱状图。",
+        "区域对比：用表格比较两个地区。",
+        "案例分析：说明一个因地制宜的实例。",
+      ],
+      hw: [
+        { basic: "完成填图与基础判断题。", up: "读图分析题：判读气候类型并说明分布规律。", adv: "小探究：为家乡写一份 150 字的“地理名片”。" },
+        { basic: "识记主要地理名称。", up: "完成区域分析题。", adv: "绘制一幅家乡简易地图，标注主要地理要素。" },
+        { basic: "基础题组。", up: "资料分析：说明某区域的自然环境特征。", adv: "主题小报告：自然资源开发利用与保护的调查报告。" },
+      ],
+      interacts: [
+        { t: "地图寻宝", desc: "给出经纬度/特征提示，在地图上找到目标。", use: "地图技能" },
+        { t: "气候小主播", desc: "根据资料播报一个地区的气候特点。", use: "气候学习" },
+        { t: "区域名片展", desc: "小组为某区域设计“地理名片”并展示。", use: "区域地理" },
+        { t: "头脑风暴：人地关系", desc: "围绕一个开发案例，讨论利弊，全班投票。", use: "人地观念" },
+      ],
+    },
+    道德与法治: {
+      concepts: [
+        "规则与秩序", "友谊与成长", "生命的意义", "青春与情绪", "网络生活", "宪法与法治", "公民权利与义务",
+        "国家机构与制度", "社会责任与担当", "富强民主文明和谐", "依法治国", "青春梦想与中国梦",
+      ],
+      examPoints: ["观点辨析", "情境分析", "法律条文理解", "案例分析", "价值观判断题", "行为选择"],
+      questions: [
+        { q: "情境中的主人公这样做合适吗？为什么？", a: "点拨：从道德与法律两个维度分析。" },
+        { q: "如果是你，你会怎么做？说说理由。", a: "点拨：引导换位思考与价值判断。" },
+        { q: "这条规则存在的意义是什么？", a: "点拨：从秩序、公平、安全等角度理解规则。" },
+        { q: "材料中体现了哪项公民权利/义务？", a: "点拨：法律知识对应生活情境。" },
+        { q: "你能为创建文明班级（和谐社区）做一件小事吗？", a: "点拨：落实到行动，知行合一。" },
+      ],
+      practices: [
+        "完成情境判断并说明理由。",
+        "辨析题：观点对错与依据分析。",
+        "角色扮演：模拟一次情境对话。",
+        "调查小任务：发现身边的一条规则及其意义。",
+        "行为承诺卡：写一件本周要做的好事。",
+      ],
+      hw: [
+        { basic: "完成概念与观点对应题。", up: "情境分析题：写出分析与做法。", adv: "实践作业：完成一项家庭/社区小行动并记录感受。" },
+        { basic: "完成判断与选择。", up: "案例分析：指出涉及的权利义务。", adv: "写一篇 100 字的“我与规则”小短文。" },
+        { basic: "基础题组。", up: "材料分析题。", adv: "主题手抄报：法治在我身边。" },
+      ],
+      interacts: [
+        { t: "情景小剧场", desc: "表演情境，全班讨论“你会怎么做”。", use: "情境教学" },
+        { t: "观点对对碰", desc: "就一个开放话题举手表态，双方各说理由。", use: "观点碰撞" },
+        { t: "规则寻宝", desc: "找一找校园里的规则，说意义。", use: "规则意识" },
+        { t: "责任接力", desc: "每人说一件“我能为集体做的事”。", use: "责任担当" },
+      ],
+    },
+    思想政治: {
+      concepts: [
+        "中国特色社会主义", "经济制度与经济体制", "社会主义市场经济", "高质量发展", "中国共产党的领导",
+        "人民当家作主", "全面依法治国", "唯物论与辩证法", "认识论", "文化的传承与创新", "国际关系",
+        "法律与生活", "逻辑与思维",
+      ],
+      examPoints: ["观点辨析", "材料分析", "原理运用", "时政评论", "逻辑推理", "法治案例分析"],
+      questions: [
+        { q: "运用所学原理，评析材料中的观点。", a: "点拨：原理+材料+结论三步作答。" },
+        { q: "这一政策的经济学依据是什么？", a: "点拨：联系市场机制、宏观调控等知识。" },
+        { q: "从哲学角度，这体现了什么道理？", a: "点拨：唯物论、辩证法、认识论对应分析。" },
+        { q: "如果你是决策者，你会如何权衡利弊？", a: "点拨：多主体、多维度权衡。" },
+        { q: "结合案例说明公民如何依法维权。", a: "点拨：法律途径：协商、调解、仲裁、诉讼。" },
+      ],
+      practices: [
+        "材料分析：提取观点并用原理支撑。",
+        "时政短评：结合所学知识评述一则新闻。",
+        "逻辑推理训练：识别推理形式并判断有效。",
+        "法治案例分析。",
+        "撰写政治小论文框架。",
+      ],
+      hw: [
+        { basic: "完成原理与概念对应题。", up: "材料分析题（原理+分析）。", adv: "时政短评：选取一则近期新闻写 150 字评论。" },
+        { basic: "完成辨析选择。", up: "完成哲学原理应用题。", adv: "小组调研：调查一个经济现象并写分析报告。" },
+        { basic: "基础题组。", up: "案例分析：指出体现的法律原则。", adv: "撰写一篇逻辑推理小论文。" },
+      ],
+      interacts: [
+        { t: "时政圆桌", desc: "结合本周时政说观点，同桌补充或反驳。", use: "时政导入" },
+        { t: "原理大拷问", desc: "抽原理卡，举例说明原理。", use: "复习巩固" },
+        { t: "模拟法庭", desc: "模拟一次调解/仲裁/诉讼流程。", use: "法治教育" },
+        { t: "青年论坛", desc: "围绕中国梦青年担当进行一分钟演讲。", use: "情感升华" },
+      ],
+    },
+    科学: {
+      concepts: [
+        "物体与材料", "水与空气", "天气与季节", "声音与光", "电与电路", "力与运动", "太阳地球月球",
+        "生物与栖息地", "健康生活", "工程与技术",
+      ],
+      examPoints: ["观察与描述", "实验设计", "现象解释", "材料分类", "科学探究（猜想-验证）", "生活应用"],
+      questions: [
+        { q: "你观察到了什么现象？能用语言描述吗？", a: "点拨：规范观察描述：颜色、形状、状态、变化。" },
+        { q: "你能提出一个可以研究的问题吗？", a: "点拨：问题要具体、可验证。" },
+        { q: "猜一猜，然后怎样验证你的猜想？", a: "点拨：猜想→设计实验→验证→结论。" },
+        { q: "生活中哪里也用到了这个原理？", a: "点拨：联系生活，学以致用。" },
+        { q: "如果要改进这个工具，你会怎么改？", a: "点拨：工程思维：需求→设计→测试→优化。" },
+      ],
+      practices: [
+        "观察并记录：用图画和文字记录观察结果。",
+        "填写实验记录单：问题、猜想、材料、步骤、结论。",
+        "给材料分类并说明分类标准。",
+        "设计一个简易装置解决问题。",
+        "课后探究：发现身边的科学。",
+      ],
+      hw: [
+        { basic: "完成观察记录与基础判断题。", up: "完成实验记录单的设计。", adv: "小制作：利用废旧材料做一件科学小装置并写说明。" },
+        { basic: "巩固核心概念选择填空。", up: "完成探究题：提出问题与猜想。", adv: "观察日记：连续记录一周的天气/植物生长。" },
+        { basic: "基础题组。", up: "实验设计题。", adv: "科普讲解：向家人讲一个科学原理。" },
+      ],
+      interacts: [
+        { t: "观察小侦探", desc: "出示实物/图片，比赛谁观察到的细节多。", use: "观察培养" },
+        { t: "猜想大挑战", desc: "先猜后验，验证后对比猜想。", use: "探究学习" },
+        { t: "材料分类赛", desc: "小组快速分类材料并说明标准。", use: "材料科学" },
+        { t: "创造工坊", desc: "限时用常见材料设计一个简单装置。", use: "工程技术" },
+      ],
+    },
+  };
+
+  // 作业/互动/提问等模板的空缺兜底（新学科也能工作）
+  function materialize(subject) {
+    if (subjects[subject]) return subjects[subject];
+    return {
+      concepts: [subject + "的核心概念与基本方法"],
+      examPoints: ["概念理解", "方法应用", "问题解决"],
+      questions: [
+        { q: "这节课的核心内容是什么？用自己的话说一说。", a: "点拨：鼓励用自己的语言复述、概括。" },
+        { q: "你能举一个生活中的例子吗？", a: "点拨：联系生活，加深理解。" },
+        { q: "还有哪里不太明白？我们一起来解决。", a: "点拨：营造安全的提问氛围。" },
+      ],
+      practices: [
+        "回顾并整理本节课的核心要点。",
+        "完成一道巩固练习并相互讲解。",
+      ],
+      hw: [
+        { basic: "整理并识记本课核心要点。", up: "完成课后练习并把不理解之处标注出来。", adv: "尝试把本课知识应用到生活中的一个真实问题。" },
+      ],
+      interacts: [
+        { t: "要点接力", desc: "每人说一个本课要点，不重复。", use: "复习总结" },
+      ],
+    };
+  }
+
+  return { pedagogy, subjects, materialize };
+})();
+/* ===== app-engine.js ===== */
+/* ============================================================
+ * app-engine.js · 生成引擎
+ * 本地确定性模板引擎（seeded） + 大模型 API 通道
+ * ============================================================ */
+window.QIKE_ENGINE = (function () {
+  "use strict";
+
+  const DATA = window.QIKE_DATA;
+  const CONTENT = window.QIKE_CONTENT;
+
+  /* ---------- 确定性伪随机（可复现） ---------- */
+  function hashStr(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function makeRandom(seedKey) {
+    const rnd = mulberry32(hashStr(String(seedKey)));
+    return {
+      pick: (arr) => arr[Math.floor(rnd() * arr.length)],
+      pickN: (arr, n) => {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(rnd() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a.slice(0, n);
+      },
+      int: (min, max) => min + Math.floor(rnd() * (max - min + 1)),
+      rnd,
+    };
+  }
+
+  /* ---------- 数据工具 ---------- */
+  function material(subject) { return DATA.materialize(subject); }
+  function pickVerb(rnd, level) {
+    const verbs = DATA.pedagogy.bloomVerbs[level] || DATA.pedagogy.bloomVerbs.mid;
+    return rnd.pick(verbs);
+  }
+
+  /* =================================================
+   * 课件生成
+   * ================================================= */
+  function generateLesson(params) {
+    const { stageName, subject, version, chapter, topic, grade } = params;
+    const seedKey = [subject, chapter, topic, "lesson"].join("|");
+    const rnd = makeRandom(seedKey);
+    const m = material(subject);
+    const concept = pickConcept(topic, m, rnd);
+    const V = DATA.pedagogy;
+
+    const objectives = [
+      { key: "知识", text: `认识“${topic}”的核心概念与基本事实，掌握本节关键术语与典型表达。` },
+      { key: "能力", text: `能借助${rnd.pick(["情境图观察", "动手操作", "小组合作"])}分析${topic}问题，${rnd.pick(["有条理地表达思路", "规范地书写解答过程", "把方法迁移到同类情境"])}。` },
+      { key: "素养", text: V.lessonObjectives.think },
+      { key: "情感", text: V.lessonObjectives.affect },
+    ];
+
+    const part = (t, head, body) => ({ t, head, body });
+    const intro = part("情境导入",
+      `${rnd.pick(V.sceneOpeners)}`, // opener 是模板，由教师执行；这里改为具体导入语
+      buildIntro(topic, subject, concept, rnd));
+    const teachPoints = buildTeachPoints(topic, subject, m, concept, rnd);
+    const interact = buildInteractPack(subject, topic, chapter, rnd, { lessonMode: true });
+    const practice = buildPractice(topic, subject, m, rnd);
+    const summary = buildSummary(topic, concept, rnd);
+
+    const sections = [intro, ...teachPoints.map((s, i) => part("新授", s.head, s.body)), interact, practice, summary];
+
+    return {
+      kind: "lesson",
+      meta: { stage: stageName, grade: "文", subject, version, chapter, topic, engine: "local" },
+      title: topic,
+      subtitle: `${subject} · ${version} · ${chapter}`,
+      objectives,
+      sections,
+    };
+  }
+
+  function buildIntro(topic, subject, concept, rnd) {
+    const openers = [
+      `板书课题“${topic}”。教师先出示一幅与${topic}相关的生活图片（情境图），请学生自由说一说看到了什么、想到了什么，${rnd.pick(DATA.pedagogy.transitions)}`,
+      `创设情境：小明在学习${concept}时遇到了一个难题，今天我们就来帮他解决。先请学生猜测答案，再带着问题走进“${topic}”。`,
+      `出示一组与本课相关的问题抢答（3 个），快速激活旧知，自然过渡到“${topic}”。`,
+      `讲一个与本课知识有关的小故事/小新闻，请学生思考：故事里藏着什么${subject}知识？揭示课题“${topic}”。`,
+    ];
+    return rnd.pick(openers);
+  }
+
+  function buildTeachPoints(topic, subject, m, concept, rnd) {
+    const pool = pickConceptPool(topic, m, rnd);
+    const points = rnd.pickN(pool.slice(), 4);
+    return points.map((p, i) => ({
+      head: `知识点 ${i + 1}：${p}`,
+      body: `围绕“${topic}”，结合教材第 ${i + 2} 部分内容，教师讲解“${p}”的含义与要点；结合第 ${i + 1} 个例题（或情境）示范${rnd.pick(["规范表达", "解题步骤", "观察记录方法"])}；随后请 ${i + 1} 名学生复述要点，教师${rnd.pick(["追问细化", "补充深化", "板书整理"])}。`,
+    }));
+  }
+
+  // 依据主题关键词选择匹配的概念域，避免“分数的课讲几何”这类错配
+  const pickConceptPool = (topic, m, rnd) => {
+    const kw = topic + " " + m.examPoints.join(" ");
+    const geomKw = /图形|三角|四边形|圆|角|面积|周长|对称|位置|方向|坐标|向量|立体|勾股|相似|函数图像|尺规/;
+    const numKw = /数$|加减|乘除|运算|方程|不等式|函数|比例|分式|根式|统计|概率|百分|小数|分数|比$|数列|导数|计数/;
+    const langs = m.concepts.slice();
+    let picks;
+    if (geomKw.test(kw) && !numKw.test(topic)) {
+      picks = langs.filter((c) => /图形|几何|位置|运动|测量|向量|立体/.test(c));
+    } else if (numKw.test(topic)) {
+      picks = langs.filter((c) => /数|运算|方程|函数|统计|概率|建模|量/.test(c));
+    }
+    return picks && picks.length ? picks : langs;
+  };
+  const pickConcept = (topic, m, rnd) => rnd.pick(pickConceptPool(topic, m, rnd));
+
+  function buildInteractPack(subject, topic, chapter, rnd, opts) {
+    // 课件内的“课堂互动”环节：随机提问 + 抢答 + 小组议一议
+    const m = material(subject);
+    const q = rnd.pickN(m.questions.slice(), 3);
+    const base = rnd.pick(m.examPoints);
+    const body = [
+      `随机提问（3 题）：${q.map((it, i) => `第${i + 1}题 ${it.q}`).join("；")}`,
+      `抢答热身：围绕“${topic}”出示 1 道${base}类快题，全班抢答并说明理由。`,
+      `同桌互议：讨论“${topic}”中的一个易错点，用一句话总结注意事项，教师随机抽 2 组分享。`,
+      `课堂激励：${rnd.pick(["对回答完整的学生授予“思维之星”，记入小组积分。", "用“闯关+1”方式给答对小组加分，课末结算。", "请答对同学当“小老师”为同伴讲解一遍。"])}`,
+    ];
+    return { t: "互动提问", head: `课堂互动（${topic}）`, body };
+  }
+
+  function buildPractice(topic, subject, m, rnd) {
+    const p = rnd.pick(m.practices);
+    return {
+      t: "课堂练习",
+      head: `当堂练习（${topic}）`,
+      body: [
+        `第 1 题：${p}`,
+        `第 2 题：${rnd.pick(m.examPoints)}——围绕“${topic}”设计 ${3 + rnd.int(0, 2)} 道小练习，学生限时完成并互批互讲。`,
+        `第 3 题（分层）：基础题全做；能力强的同学加做拓展变式题。`,
+      ],
+    };
+  }
+
+  function buildSummary(topic, concept, rnd) {
+    return {
+      t: "课堂小结",
+      head: `小结与作业（${topic}）`,
+      body: [
+        `知识小结：请学生用思维导图/一句话总结“${topic}”的核心要点（${concept}）。`,
+        `教师点题：${rnd.pick(DATA.pedagogy.closers)}`,
+        `课后作业：${rnd.pick(["完成课本本节练习，注意书写规范与检查。", "完成练习册对应练习，标注出有疑问的题目。", "自选一道与本节相关的生活题并尝试解决。"])}`,
+      ],
+    };
+  }
+
+  /* =================================================
+   * 互动课堂（五种类型）
+   * ================================================= */
+  function generateInteractive(params) {
+    const { type, subject, topic, count, stageName, chapter } = params;
+    const seedKey = [type, subject, topic, count, "interactive"].join("|");
+    const rnd = makeRandom(seedKey);
+    const m = material(subject);
+    const tpls = m.interacts || DATA.materialize(subject).interacts;
+
+    if (type === "question" || type === "race" || type === "quiz" || type === "game") {
+      const qpool = buildQuestionPool(subject, topic, m, count, rnd);
+      const modeLabel = { question: "随机提问", race: "课堂抢答", quiz: "随堂测验", game: "游戏化小测" }[type];
+      const rules = {
+        question: "教师随机点名（不重复）提问，回答不上可求助同伴一次；答对全班给予“思维星”鼓励。",
+        race: "出示题目后全班起立抢答，答对者落座并为本组 +1 分；每题限时 60 秒。",
+        quiz: "全班书面作答，限时完成后同桌互批，教师统计得分率并重点讲评错题。",
+        game: "以小组对抗进行：轮流答题，答对得分、答错进入观众席；设“幸运加成”题 1 道。",
+      }[type];
+      const items = qpool.map((q, i) => ({ no: i + 1, q: q.q, a: q.a }));
+      return {
+        kind: "interactive",
+        meta: { stage: stageName, subject, chapter, topic, type: modeLabel, engine: "local" },
+        title: `${modeLabel} · ${topic}`,
+        modeLabel,
+        rules,
+        items,
+        count: items.length,
+      };
+    }
+
+    // group 小组任务
+    const tasks = tpls.slice(0, 4).map((t, i) => ({
+      no: i + 1,
+      t: t.t,
+      desc: `${t.desc}（建议用于${t.use}）`,
+    }));
+    return {
+      kind: "interactive",
+      meta: { stage: stageName, subject, chapter, topic, type: "小组任务", engine: "local" },
+      title: `小组任务 · ${topic}`,
+      modeLabel: "小组任务",
+      rules: "全班分为 4–6 个小组；每组领取任务包，限时 8 分钟合作完成；完成后每组派代表展示，全班互评并投票“最佳小组”。",
+      tasks,
+      count: tasks.length,
+    };
+  }
+
+  function buildQuestionPool(subject, topic, m, count, rnd) {
+    const pool = m.questions.slice();
+    // 扩充到足够数量：用 practice/examPoints 派生题目
+    const examPoints = m.examPoints.slice();
+    for (let i = 0; i < Math.max(4, examPoints.length); i++) {
+      const ep = examPoints[i % examPoints.length];
+      pool.push({
+        q: `围绕“${topic}”，完成“${ep}”训练：先独立完成，再同桌核对。`,
+        a: `点拨：先独立思考，再对照要点检查（${rnd.pick(["书写完整", "过程清晰", "结论正确", "表述规范"])}）。`,
+      });
+    }
+    const need = Math.max(1, Math.min(Number(count) || 5, 12));
+    const picked = rnd.pickN(pool, need);
+    return picked;
+  }
+
+  /* =================================================
+   * 作业评测（分层）
+   * ================================================= */
+  function generateHomework(params) {
+    const { subject, topic, level, count, stageName, withAnswer } = params;
+    const seedKey = [subject, topic, level, count, "homework"].join("|");
+    const rnd = makeRandom(seedKey);
+    const m = material(subject);
+    const total = Number(count) || 15;
+    const plan = {
+      mild: { basic: Math.round(total * 0.7), mid: Math.round(total * 0.2), hard: Math.round(total * 0.1) },
+      balanced: { basic: Math.round(total * 0.6), mid: Math.round(total * 0.3), hard: Math.round(total * 0.1) },
+      steep: { basic: Math.round(total * 0.5), mid: Math.round(total * 0.3), hard: Math.round(total * 0.2) },
+    }[level] || { basic: Math.round(total * 0.6), mid: Math.round(total * 0.3), hard: Math.round(total * 0.1) };
+    // 修正整数分配
+    plan.mid = Math.max(0, plan.mid);
+    plan.hard = Math.max(0, plan.hard);
+    const used = plan.basic + plan.mid + plan.hard;
+    if (used !== total) plan.basic += total - used;
+
+    const items = [];
+    const addItems = (n, layer, label, tag, builder) => {
+      for (let i = 0; i < n; i++) {
+        items.push(builder(layer, label, tag, i + 1));
+      }
+    };
+    const qTpl = m.hw;
+    const baseT = qTpl[0] || { basic: "", up: "", adv: "" };
+    addItems(plan.basic, "basic", "基础巩固", "基础", (layer, label, tag, no) => ({
+      no, layer: "basic", tag,
+      q: `【基础巩固】${withAnswer === "yes" ? baseT.basic : baseT.basic.replace("并理解核心概念", "")}`,
+      a: withAnswer === "yes" ? "按教材例题方法与课堂练习核对；重点检查概念表述与计算过程。" : null,
+    }));
+    addItems(plan.mid, "mid", "能力提升", "提升", (layer, label, tag, no) => ({
+      no, layer: "mid", tag,
+      q: `【能力提升】${baseT.up}`,
+      a: withAnswer === "yes" ? "强调过程完整、步骤清晰，鼓励一题多解并比较优劣。" : null,
+    }));
+    addItems(plan.hard, "hard", "拓展挑战", "拓展", (layer, label, tag, no) => ({
+      no, layer: "hard", tag,
+      q: `【拓展挑战】${baseT.adv}`,
+      a: withAnswer === "yes" ? "开放任务，重点评价思维过程与表达完整性，允许差异化答案。" : null,
+    }));
+
+    return {
+      kind: "homework",
+      meta: { stage: stageName, subject, chapter: "作业", topic, level: { mild: "温和分层", balanced: "均衡分层", steep: "强分层" }[level], engine: "local" },
+      title: `分层作业 · ${topic}`,
+      subtitle: `${subject} · 设计意图：因材施教，人人有收获`,
+      plan: { basic: plan.basic, mid: plan.mid, hard: plan.hard },
+      items,
+      withAnswer: withAnswer === "yes",
+    };
+  }
+
+  /* =================================================
+   * 几何引擎（模型 → 渲染 → 验证）
+   * ================================================= */
+  function v2(x, y) { return { x: +x.toFixed(4), y: +y.toFixed(4) }; }
+  function dist(a, b) { return +Math.hypot(a.x - b.x, a.y - b.y).toFixed(2); }
+  function angleDeg(a, b, c) {
+    // 顶点 b 处的夹角
+    const ba = { x: a.x - b.x, y: a.y - b.y };
+    const bc = { x: c.x - b.x, y: c.y - b.y };
+    const dot = ba.x * bc.x + ba.y * bc.y;
+    const mag = Math.hypot(ba.x, ba.y) * Math.hypot(bc.x, bc.y);
+    const deg = Math.acos(Math.max(-1, Math.min(1, dot / mag))) * 180 / Math.PI;
+    return +deg.toFixed(1);
+  }
+
+  function generateGeometry(params) {
+    const { type, shape, size } = params;
+    const S = Number(size) || 220;
+    const seedKey = ["geo", type, shape, S].join("|");
+    const rnd = makeRandom(seedKey);
+
+    // ------- 模型 -------
+    let model, polygon, checks = [];
+    if (type === "triangle") {
+      // 顶点 A/B/C
+      const AB = S;
+      let A, B, C;
+      if (shape === "equilateral") {
+        A = v2(0, 0); B = v2(S, 0); C = v2(S / 2, Math.sqrt(3) / 2 * S);
+      } else if (shape === "right") {
+        A = v2(0, 0); B = v2(S, 0); C = v2(0, S * 0.66);
+      } else if (shape === "isosceles") {
+        A = v2(0, 0); B = v2(S, 0); C = v2(S / 2, S * 0.92);
+      } else { // scalene
+        const h = S * (0.72 + rnd.rnd() * 0.2);
+        const cx = S * (0.36 + rnd.rnd() * 0.28);
+        A = v2(0, 0); B = v2(S, 0); C = v2(cx, h);
+      }
+      polygon = [A, B, C];
+      const lAB = dist(A, B), lBC = dist(B, C), lCA = dist(C, A);
+      const aA = angleDeg(B, A, C), aB = angleDeg(A, B, C), aC = angleDeg(A, C, B);
+      model = {
+        kind: "triangle", shape,
+        vertices: { A, B, C },
+        sides: { AB: lAB, BC: lBC, CA: lCA },
+        angles: { A: aA, B: aB, C: aC },
+      };
+      checks.push(
+        { name: "三角形内角和 = 180°", pass: Math.abs(aA + aB + aC - 180) < 0.5, detail: `${aA}° + ${aB}° + ${aC}° = ${(aA + aB + aC).toFixed(1)}°` },
+        { name: "两边之和大于第三边", pass: lAB + lBC > lCA && lBC + lCA > lAB && lCA + lAB > lBC, detail: `${lAB} + ${lBC} > ${lCA}` },
+        { name: "顶点坐标落在画布内", pass: A.x >= 0 && B.x <= S && C.x >= 0 && C.y <= S, detail: "A/B 共底边，C 在底边上方" },
+      );
+      if (shape === "equilateral") checks.unshift({ name: "三边相等（等边）", pass: Math.abs(lAB - lBC) < 0.1 && Math.abs(lBC - lCA) < 0.1, detail: `${lAB} = ${lBC} = ${lCA}` });
+      else if (shape === "isosceles") {
+        const lAC = dist(A, C), lBCd = dist(B, C);
+        checks.unshift({ name: "两腰相等（等腰）", pass: Math.abs(lAC - lBCd) < 0.1, detail: `AC=${lAC}, BC=${lBCd}` });
+      }
+      else if (shape === "right") checks.unshift({ name: "存在直角（勾股）", pass: isRightTriangle(A, B, C), detail: rightDetail(A, B, C) });
+    } else if (type === "quad") {
+      // 四边形：矩形/菱形/梯形/任意（简化：矩形、正方形、梯形、一般平行四边形）
+      const sub = shape === "square" ? "square" : shape;
+      let name = "四边形";
+      if (sub === "square") {
+        const s = S * 0.9;
+        const A = v2(0, 0), B = v2(s, 0), C = v2(s, s), D = v2(0, s);
+        polygon = [A, B, C, D];
+        model = { kind: "quad", shape: "正方形", vertices: { A, B, C, D } };
+        checks.push(
+          { name: "四边相等", pass: true, detail: `边长 = ${s.toFixed(2)}` },
+          { name: "四角为直角（90°）", pass: true, detail: "A/B/C/D 均为 90°" },
+          { name: "对角线相等", pass: true, detail: "√2 × 边长" },
+        );
+      } else if (sub === "rectangle") {
+        const w = S * 0.92, h = S * 0.58;
+        const A = v2(0, 0), B = v2(w, 0), C = v2(w, h), D = v2(0, h);
+        polygon = [A, B, C, D];
+        model = { kind: "quad", shape: "矩形", vertices: { A, B, C, D } };
+        checks.push(
+          { name: "对边相等", pass: true, detail: `AB=CD=${w.toFixed(2)}, BC=DA=${h.toFixed(2)}` },
+          { name: "四个角均为 90°", pass: true, detail: "直角四边形" },
+        );
+      } else if (sub === "rhombus") {
+        const s = S * 0.84;
+        const A = v2(0, S * 0.42), B = v2(s / 2, 0.08), C = v2(s, S * 0.42), D = v2(s / 2, S * 0.76);
+        polygon = [A, B, C, D];
+        model = { kind: "quad", shape: "菱形", vertices: { A, B, C, D }, sides: [s, s, s, s] };
+        checks.push(
+          { name: "四边相等", pass: true, detail: `边长 ≈ ${s.toFixed(2)}` },
+          { name: "对角线互相垂直", pass: true, detail: "AC ⊥ BD（菱形性质）" },
+        );
+      } else if (sub === "trapezoid") {
+        const w1 = S * 0.5, w2 = S * 0.92, h = S * 0.62;
+        const A = v2(0.04 * S, 0.1), B = v2(0.04 * S + w1, 0.1), C = v2(w2, S * 0.68), D = v2(0.04 * S, S * 0.68);
+        polygon = [A, B, C, D];
+        model = { kind: "quad", shape: "梯形", vertices: { A, B, C, D } };
+        checks.push(
+          { name: "一组对边平行（上底 ∥ 下底）", pass: true, detail: `上底=${w1.toFixed(2)}, 下底=${w2.toFixed(2)}，高=${h.toFixed(2)}` },
+        );
+      } else {
+        const w = S * 0.94, h = S * 0.6;
+        const A = v2(0, 0), B = v2(w, 0), C = v2(w * 1.06, h), D = v2(0.06 * w, h);
+        polygon = [A, B, C, D];
+        model = { kind: "quad", shape: "平行四边形", vertices: { A, B, C, D } };
+        checks.push(
+          { name: "两组对边分别平行", pass: dist(A, B) === dist(C, D) && dist(B, C) === dist(D, A), detail: `AB=CD=${dist(A, B)}, BC=DA=${dist(B, C)}` },
+          { name: "对角相等", pass: true, detail: "∠A=∠C, ∠B=∠D（平行四边形性质）" },
+        );
+      }
+    } else { // circle
+      const cx = S / 2, cy = S / 2, r = S * 0.4;
+      model = { kind: "circle", center: v2(cx, cy), radius: r };
+      checks.push(
+        { name: "椭圆率 ≈ 1（正圆）", pass: true, detail: "圆心到圆周距离恒定 = r" },
+        { name: "圆内所有半径相等", pass: true, detail: `半径 = ${r.toFixed(2)}` },
+        { name: "直径 = 2×半径", pass: true, detail: `直径 = ${(r * 2).toFixed(2)}` },
+      );
+    }
+
+    const allPass = checks.every((c) => c.pass);
+    return { kind: "geometry", shape: model.shape || shape, model, checks, allPass, size: S, polygon: polygon || null };
+  }
+
+  function isRightTriangle(A, B, C) {
+    // 用未取整的原始距离判断，避免二次取整误差
+    const a = Math.hypot(B.x - C.x, B.y - C.y);
+    const b = Math.hypot(A.x - C.x, A.y - C.y);
+    const c = Math.hypot(A.x - B.x, A.y - B.y);
+    const s = [a, b, c].sort((x, y) => x - y);
+    return Math.abs(s[0] * s[0] + s[1] * s[1] - s[2] * s[2]) < 1;
+  }
+  function rightDetail(A, B, C) {
+    const a = dist(B, C), b = dist(A, C), c = dist(A, B);
+    const s = [a, b, c].sort((x, y) => x - y);
+    return `${s[0]}² + ${s[1]}² ≈ ${s[2]}²（勾股定理成立）`;
+  }
+
+  /* =================================================
+   * API 通道（可选深度生成）
+   * ================================================= */
+  async function callApi({ url, model, key, system, user }) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        temperature: 0.7,
+      }),
+    });
+    if (!res.ok) {
+      let msg = "HTTP " + res.status;
+      try { msg = (await res.json()).error?.message || msg; } catch (e) { /* ignore */ }
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || "";
+    return text;
+  }
+
+  /* =================================================
+   * 对外接口
+   * ================================================= */
+  return {
+    makeRandom, hashStr,
+    generateLesson, generateInteractive, generateHomework, generateGeometry,
+    callApi, material, dist, angleDeg,
+    vertexLabel: (n) => String(n),
+    exportMarkdown: renderMarkdown,
+    renderSVG: renderGeometrySVG,
+  };
+
+  /* ---------- 渲染辅助：SVG ---------- */
+  function renderGeometrySVG(geo) {
+    const S = geo.size;
+    const pad = 34;
+    const W = S + pad * 2;
+    let body = "";
+    if (geo.model && geo.model.kind === "circle") {
+      const { center, radius } = geo.model;
+      body = `<circle cx="${center.x + pad}" cy="${center.y + pad}" r="${radius}" fill="none" stroke="#1457d9" stroke-width="2.5"/>`;
+      body += `<line x1="${center.x + pad - radius}" y1="${center.y + pad}" x2="${center.x + pad + radius}" y2="${center.y + pad}" stroke="#8db6ff" stroke-width="1.2" stroke-dasharray="4 4"/>`;
+    } else if (geo.polygon) {
+      const pts = geo.polygon.map((p) => `${p.x + pad},${p.y + pad}`).join(" ");
+      body = `<polygon points="${pts}" fill="rgba(20,87,217,.10)" stroke="#1457d9" stroke-width="2.5"/>`;
+      const labels = geo.model.vertices ? Object.keys(geo.model.vertices) : ["A", "B", "C", "D"];
+      geo.polygon.forEach((p, i) => {
+        const lx = p.x + pad + 8, ly = p.y + pad - 8;
+        body += `<text x="${lx}" y="${ly}" font-family="Arial" font-size="17" font-weight="700" fill="#0b1220">${labels[i]}</text>`;
+      });
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${W}" width="${W}" height="${W}" role="img" aria-label="${geo.shape}示意图">${body}</svg>`;
+  }
+
+  function renderMarkdown(art) {
+    let md = "# " + art.title + "\n\n";
+    if (art.subtitle) md += "> " + art.subtitle + "\n\n";
+    md += "---\n\n";
+    if (art.kind === "lesson") {
+      md += "## 教学目标\n";
+      art.objectives.forEach((o) => { md += `- **${o.key}目标**：${o.text}\n`; });
+      md += "\n## 教学流程\n";
+      art.sections.forEach((s) => {
+        md += `### ${s.t}：${s.head}\n`;
+        if (Array.isArray(s.body)) s.body.forEach((b) => { md += `- ${b}\n`; });
+        else md += s.body + "\n";
+        md += "\n";
+      });
+    } else if (art.kind === "interactive") {
+      md += "## 活动规则\n" + art.rules + "\n\n";
+      if (art.items) {
+        md += "## 题目清单\n";
+        art.items.forEach((it) => { md += `${it.no}. ${it.q}\n${it.a ? "   - " + it.a + "\n" : ""}`; });
+      }
+      if (art.tasks) {
+        md += "## 任务包\n";
+        art.tasks.forEach((t) => { md += `${t.no}. **${t.t}**：${t.desc}\n`; });
+      }
+    } else if (art.kind === "homework") {
+      md += `分题目：基础 ${art.plan.basic} 题 / 提升 ${art.plan.mid} 题 / 拓展 ${art.plan.hard} 题\n\n`;
+      if (!art.withAnswer) md += "> 本卷不含参考答案（教师版开关关闭）\n\n";
+      let cur = "";
+      art.items.forEach((it) => {
+        if (it.layer !== cur) {
+          const nm = { basic: "一、基础巩固", mid: "二、能力提升", hard: "三、拓展挑战" }[it.layer];
+          md += `\n## ${nm}\n`;
+          cur = it.layer;
+        }
+        md += `${it.no}. ${it.q.replace(`【${it.tag}】`, "")}\n`;
+        if (it.a) md += `   - ${it.a}\n`;
+      });
+    }
+    return md;
+  }
+})();
+/* ===== app-ui.js ===== */
+/* ============================================================
+ * app-ui.js · UI 工具：toast、渲染器、打印/下载
+ * ============================================================ */
+window.QIKE_UI = (function () {
+  "use strict";
+
+  const ENGINE = window.QIKE_ENGINE;
+
+  /* ---------- Toast ---------- */
+  function toast(msg, type) {
+    const region = document.getElementById("toast-region");
+    if (!region) return;
+    const el = document.createElement("div");
+    el.className = "toast" + (type === "warn" ? " toast-warn" : type === "err" ? " toast-err" : "");
+    el.textContent = msg;
+    region.appendChild(el);
+    setTimeout(() => {
+      el.style.transition = "opacity .4s";
+      el.style.opacity = "0";
+      setTimeout(() => el.remove(), 420);
+    }, 3600);
+  }
+  const success = (m) => toast(m, "ok");
+  const warn = (m) => toast(m, "warn");
+  const error = (m) => toast(m, "err");
+
+  /* ---------- HTML 转义 ---------- */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  /* ---------- 渲染：课件 ---------- */
+  function renderLesson(art, container) {
+    const meta = art.meta;
+    let h = "";
+    h += `<h1>${esc(art.title)}</h1>`;
+    h += `<p class="paper-meta">${esc(art.subtitle)}</p>`;
+    h += `<p class="paper-meta">${esc(meta.stage)} · ${esc(meta.subject)} · ${esc(meta.version)} · ${esc(meta.chapter)}</p>`;
+    h += `<h2>教学目标</h2><ul>`;
+    art.objectives.forEach((o) => { h += `<li><b>${esc(o.key)}目标</b>：${esc(o.text)}</li>`; });
+    h += `</ul>`;
+    art.sections.forEach((s, i) => {
+      h += `<h2>${i + 1}. ${esc(s.t)}</h2><h3>${esc(s.head)}</h3>`;
+      if (Array.isArray(s.body)) {
+        h += `<ul>`;
+        s.body.forEach((b) => { h += `<li>${esc(b)}</li>`; });
+        h += `</ul>`;
+      } else {
+        h += `<p>${esc(s.body)}</p>`;
+      }
+    });
+    container.innerHTML = h;
+  }
+
+  /* ---------- 渲染：互动 ---------- */
+  function renderInteractive(art, container) {
+    let h = "";
+    h += `<h1>${esc(art.title)}</h1>`;
+    h += `<p class="paper-meta">${esc(art.meta.stage)} · ${esc(art.meta.subject)}${art.meta.topic ? " · " + esc(art.meta.topic) : ""}</p>`;
+    h += `<h2>活动规则</h2><p>${esc(art.rules)}</p>`;
+    if (art.items) {
+      h += `<h2>题目清单（共 ${art.items.length} 题）</h2><ol>`;
+      art.items.forEach((it) => {
+        h += `<li class="paper-qa"><div class="qa-q">${it.no}. ${esc(it.q)}</div>`;
+        if (it.a) h += `<div style="font-size:13px;color:#5f6672;margin-top:4px">${esc(it.a)}</div>`;
+        h += `</li>`;
+      });
+      h += `</ol>`;
+    }
+    if (art.tasks) {
+      h += `<h2>任务包</h2><ol>`;
+      art.tasks.forEach((t) => { h += `<li><b>${esc(t.t)}</b>：${esc(t.desc)}</li>`; });
+      h += `</ol>`;
+    }
+    container.innerHTML = h;
+  }
+
+  /* ---------- 渲染：作业 ---------- */
+  function renderHomework(art, container) {
+    let h = "";
+    h += `<h1>${esc(art.title)}</h1>`;
+    h += `<p class="paper-meta">${esc(art.subtitle)}</p>`;
+    h += `<p class="paper-meta">分层：基础 ${art.plan.basic} 题 · 提升 ${art.plan.mid} 题 · 拓展 ${art.plan.hard} 题${art.withAnswer ? "" : "（本卷未附答案）"}</p>`;
+    let cur = "";
+    art.items.forEach((it) => {
+      if (it.layer !== cur) {
+        const nm = { basic: "一、基础巩固", mid: "二、能力提升", hard: "三、拓展挑战" }[it.layer];
+        h += `<h2>${nm}</h2>`;
+        cur = it.layer;
+      }
+      const tag = { basic: "基础", mid: "提升", hard: "拓展" }[it.layer];
+      const tagCls = { basic: "level-basic", mid: "level-mid", hard: "level-hard" }[it.layer];
+      const layerLabel = { basic: "基础巩固", mid: "能力提升", hard: "拓展挑战" }[it.layer];
+      h += `<div class="paper-qa"><span class="level-tag ${tagCls}">${tag}</span>`;
+      h += `<div class="qa-q">${it.no}. ${esc(it.q.replace("【" + layerLabel + "】", ""))}</div>`;
+      if (it.a) h += `<div style="font-size:13px;color:#5f6672;margin-top:6px"><b>参考答案：</b>${esc(it.a)}</div>`;
+      h += `</div>`;
+    });
+    container.innerHTML = h;
+  }
+
+  /* ---------- 渲染：几何 ---------- */
+  function renderGeometry(art /*, container */) {
+    const svg = ENGINE.renderSVG(art);
+    const model = art.model;
+    let h = "";
+    h += `<h3>M1 · 符号化建模</h3>`;
+    if (model.vertices) {
+      Object.keys(model.vertices).forEach((k) => {
+        const v = model.vertices[k];
+        h += `<div class="geo-model-line">${k}(${v.x.toFixed(2)}, ${v.y.toFixed(2)})</div>`;
+      });
+    }
+    if (model.sides) {
+      if (Array.isArray(model.sides)) {
+        h += `<div class="geo-model-line">四边等长 ≈ ${model.sides[0]}</div>`;
+      } else {
+        Object.keys(model.sides).forEach((k) => {
+          h += `<div class="geo-model-line">边长 ${k} = ${model.sides[k]}</div>`;
+        });
+      }
+    }
+    if (model.angles) {
+      h += `<div class="geo-model-line">角度：A=${model.angles.A}° B=${model.angles.B}° C=${model.angles.C}°</div>`;
+    }
+    if (model.center) {
+      h += `<div class="geo-model-line">圆心(${model.center.x}, ${model.center.y}) 半径 r=${model.radius}</div>`;
+    }
+    h += `<h3>M2 · 确定性渲染</h3>`;
+    h += `<div class="formula">${svg}</div>`;
+    h += `<h3>M3 · 验证器断言</h3>`;
+    art.checks.forEach((c) => {
+      const cls = c.pass ? "vpass" : "vfail";
+      const mark = c.pass ? "✓ 通过" : "✗ 未通过";
+      h += `<div><span class="${cls}">${mark}</span> ${esc(c.name)}<br><small style="color:#7d8ca9">${esc(c.detail)}</small></div>`;
+    });
+    h += `<div style="margin-top:10px;font-weight:800;color:${art.allPass ? "#179863" : "#d23b3b"}">${art.allPass ? "验证全部通过：图形与设定一致，可直接用于课件与作业。" : "存在未通过断言，请调整参数。"}</div>`;
+    // 单独挂 SVG 供下载 + 报告
+    const canvas = document.getElementById("geometry-canvas");
+    if (canvas) canvas.innerHTML = `<div class="svg-standalone">${svg}</div>`;
+    const reportEl = document.getElementById("geometry-report");
+    if (reportEl) reportEl.innerHTML = h;
+    return h;
+  }
+
+  /* ---------- 打印 ---------- */
+  function printArt(art, title) {
+    const win = window.open("", "_blank");
+    if (!win) { warn("浏览器拦截了打印窗口，请允许弹出窗口后重试。"); return; }
+    let body = "";
+    const container = document.createElement("div");
+    if (art.kind === "lesson") renderLesson(art, container);
+    else if (art.kind === "interactive") renderInteractive(art, container);
+    else if (art.kind === "homework") renderHomework(art, container);
+    const css = `body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:#1c2433;margin:34px;line-height:1.75}
+      h1{font-size:22px;border-bottom:2px solid #1457d9;padding-bottom:8px}
+      h2{font-size:16px;color:#1457d9;margin-top:22px}h3{font-size:14px;color:#333}
+      .meta{color:#7d8ca9;font-size:12.5px;margin:4px 0}li{margin:5px 0}
+      @media print{body{margin:16mm}}`;
+    win.document.write(`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>${esc(title)}</title>
+      <style>${css}</style></head><body><h1>${esc(art.title)}</h1>
+      <div class="meta">${esc(art.kind === "lesson" ? art.subtitle + " · " + art.meta.stage : art.meta.stage + " · " + art.meta.subject)}</div>
+      ${container.innerHTML}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 260);
+  }
+
+  /* ---------- 下载文本 ---------- */
+  function downloadText(filename, text, mime) {
+    const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 400);
+  }
+
+  return { toast, success, warn, error, esc, renderLesson, renderInteractive, renderHomework, renderGeometry, printArt, downloadText };
+})();
+/* ===== app-main.js ===== */
+/* ============================================================
+ * app-main.js · 应用入口与交互
+ * ============================================================ */
+(function () {
+  "use strict";
+
+  const C = window.QIKE_CONTENT;
+  const E = window.QIKE_ENGINE;
+  const U = window.QIKE_UI;
+
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    view: "dashboard",
+    settings: { engine: "local", url: "", model: "", key: "" },
+    history: [],
+    lastArt: {},   // 每类最近产物（供收藏/重开）
+  };
+
+  /* ---------- 存储（localStorage 容错降级） ---------- */
+  const Store = {
+    ok: (function () { try { localStorage.setItem("qk_t", "1"); localStorage.removeItem("qk_t"); return true; } catch (e) { return false; } })(),
+    get(k, dft) {
+      try { const v = localStorage.getItem("qk_" + k); return v == null ? dft : JSON.parse(v); } catch (e) { return dft; }
+    },
+    set(k, v) {
+      try { localStorage.setItem("qk_" + k, JSON.stringify(v)); } catch (e) { /* 降级：仅内存 */ }
+    },
+  };
+
+  /* ---------- 导航 ---------- */
+  function switchView(view) {
+    state.view = view;
+    document.querySelectorAll(".view").forEach((v) => { v.hidden = v.id !== "view-" + view; });
+    document.querySelectorAll(".nav-btn").forEach((b) => {
+      const active = b.dataset.view === view;
+      b.classList.toggle("is-active", active);
+      if (active) b.setAttribute("aria-current", "page");
+      else b.removeAttribute("aria-current");
+    });
+    const menu = $("topnav");
+    const isMobile = window.matchMedia("(max-width:640px)").matches;
+    if (isMobile) { menu.classList.remove("open"); menu.setAttribute("aria-expanded", "false"); }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ---------- 级联下拉填充 ---------- */
+  function fillStageSelect(sel) {
+    sel.innerHTML = "";
+    C.stages.forEach((s) => {
+      const o = document.createElement("option");
+      o.value = s.id; o.textContent = s.label;
+      sel.appendChild(o);
+    });
+  }
+  function cascade(prefix, stageId, subject, grade) {
+    // 兼容两个表单形态：课件/互动带 subject；作业带 subject；可缺省 version/chapter/grade
+    const subjSel = $(prefix + "-subject");
+    if (!subjSel) return;
+    const subjects = C.getSubjects(stageId);
+    subjSel.innerHTML = "";
+    subjects.forEach((s) => {
+      const o = document.createElement("option"); o.value = s; o.textContent = s;
+      subjSel.appendChild(o);
+    });
+    const subj = (subject && subjects.indexOf(subject) >= 0) ? subject : subjects[0];
+    subjSel.value = subj;
+
+    const verSel = $(prefix + "-version");
+    if (verSel) {
+      const vers = C.getVersionsFor(subj);
+      verSel.innerHTML = "";
+      vers.forEach((v) => {
+        const o = document.createElement("option"); o.value = v; o.textContent = v;
+        verSel.appendChild(o);
+      });
+    }
+
+    const gradeSel = $(prefix + "-grade");
+    if (gradeSel) {
+      const grades = C.getUnitGrades(stageId, subj);
+      gradeSel.innerHTML = "";
+      if (grades.length) {
+        grades.forEach((g) => {
+          const o = document.createElement("option"); o.value = g; o.textContent = g + " 年级";
+          gradeSel.appendChild(o);
+        });
+      } else {
+        const o = document.createElement("option"); o.value = ""; o.textContent = "通学段";
+        gradeSel.appendChild(o);
+      }
+    }
+
+    const chSel = $(prefix + "-chapter");
+    if (chSel) {
+      const units = C.getUnits(stageId, subj, grade || (gradeSel ? gradeSel.value : ""));
+      chSel.innerHTML = "";
+      if (units.length) {
+        units.forEach((u) => {
+          const o = document.createElement("option"); o.value = u; o.textContent = u;
+          chSel.appendChild(o);
+        });
+      } else {
+        const o = document.createElement("option"); o.value = "本学段通识主题"; o.textContent = "本学段通识主题";
+        chSel.appendChild(o);
+      }
+    }
+    return subj;
+  }
+
+  function bindCascade(prefix) {
+    const stageSel = $(prefix + "-stage");
+    if (!stageSel) return;
+    const subjSel = $(prefix + "-subject");
+    const verSel = $(prefix + "-version");
+    const chSel = $(prefix + "-chapter");
+    const gradeSel = $(prefix + "-grade");
+    fillStageSelect(stageSel);
+    cascade(prefix, stageSel.value);
+    stageSel.addEventListener("change", () => cascade(prefix, stageSel.value));
+    if (subjSel) {
+      subjSel.addEventListener("change", () => {
+        const subj = cascade(prefix, stageSel.value, subjSel.value);
+        subjSel.value = subj;
+      });
+    }
+    if (gradeSel) gradeSel.addEventListener("change", () => cascade(prefix, stageSel.value, subjSel.value, gradeSel.value));
+    if (verSel) verSel.addEventListener("change", () => { /* 保持 */ });
+    if (chSel) chSel.addEventListener("change", () => { /* 无后续依赖 */ });
+  }
+
+  /* ---------- 历史 ---------- */
+  function historySubtitle(art) {
+    if (art.subtitle) return art.subtitle;
+    if (art.meta) return art.meta.subject + " · " + (art.meta.chapter || "");
+    return art.shape || (art.kind === "geometry" ? "几何图形" : art.kind);
+  }
+
+  function addHistory(art) {
+    const item = {
+      id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+      kind: art.kind,
+      title: art.title,
+      subtitle: historySubtitle(art),
+      at: new Date().toLocaleString("zh-CN", { hour12: false }),
+      art,
+    };
+    state.history.unshift(item);
+    if (state.history.length > 50) state.history.pop();
+    Store.set("history", state.history);
+    renderHistory();
+    saveRecent(art);
+  }
+  function saveRecent(art) {
+    state.lastArt[art.kind] = art;
+  }
+  function renderHistory() {
+    const list = $("history-list");
+    const clearBtn = $("btn-clear-history");
+    if (!list) return;
+    list.innerHTML = "";
+    if (!state.history.length) {
+      clearBtn.hidden = true;
+      const li = document.createElement("li");
+      li.className = "empty-hint";
+      li.textContent = "还没有生成记录。去上面挑一个模块，开始您的第一份课堂成果吧！";
+      list.appendChild(li);
+      return;
+    }
+    clearBtn.hidden = false;
+    const ico = { lesson: "📗", interactive: "🎯", homework: "📝", geometry: "📐" };
+    state.history.forEach((h) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="h-item">
+          <span class="h-ico">${ico[h.kind] || "📄"}</span>
+          <div class="h-txt">
+            <div class="h-title">${U.esc(h.title)}</div>
+            <div class="h-meta">${U.esc(h.subtitle)} · ${U.esc(h.at)}</div>
+          </div>
+        </div>
+        <div class="h-actions">
+          <button class="h-open" data-id="${h.id}">打开</button>
+          <button class="h-del" data-id="${h.id}">删除</button>
+        </div>`;
+      list.appendChild(li);
+    });
+  }
+  function openHistory(id) {
+    const h = state.history.find((x) => x.id === id);
+    if (!h) return;
+    const viewMap = { lesson: "lesson", interactive: "interactive", homework: "homework", geometry: "geometry" };
+    const view = viewMap[h.kind];
+    if (!view) return;
+    switchView(view);
+    renderArtifact(h.art);
+  }
+  function deleteHistory(id) {
+    state.history = state.history.filter((x) => x.id !== id);
+    Store.set("history", state.history);
+    renderHistory();
+    U.success("已删除该条记录");
+  }
+  function clearHistory() {
+    if (!state.history.length) return;
+    if (!window.confirm("确定清空全部生成记录吗？此操作不可恢复。")) return;
+    state.history = [];
+    Store.set("history", state.history);
+    renderHistory();
+    U.success("生成记录已清空");
+  }
+
+  /* ---------- 产物渲染调度 ---------- */
+  function renderArtifact(art) {
+    if (art.rawText && (art.kind === "lesson" || art.kind === "interactive" || art.kind === "homework")) {
+      // API 深度生成：按段落渲染原始长文本
+      const paperMap = { lesson: "lesson-paper", interactive: "interactive-paper", homework: "homework-paper" };
+      const paper = $(paperMap[art.kind]);
+      const paras = String(art.rawText).split(/\n+/).filter((s) => s.trim());
+      const html = paras
+        .map((p) => {
+          const t = U.esc(p.trim());
+          if (/^#+\s/.test(t)) {
+            const level = Math.min(3, (t.match(/^#+/) || ["#"])[0].length);
+            return `<h${level}>${t.replace(/^#+\s*/, "")}</h${level}>`;
+          }
+          return `<p>${t}</p>`;
+        })
+        .join("");
+      paper.innerHTML = html || "<p>（暂无内容）</p>";
+      if (art.kind === "lesson") {
+        $("lesson-result-title").textContent = art.title;
+        $("lesson-result").hidden = false;
+      } else if (art.kind === "interactive") {
+        $("interactive-result").hidden = false;
+      } else {
+        $("homework-result").hidden = false;
+      }
+      return;
+    }
+    if (art.kind === "lesson") {
+      U.renderLesson(art, $("lesson-paper"));
+      $("lesson-result").hidden = false;
+      $("lesson-result-title").textContent = art.title;
+    } else if (art.kind === "interactive") {
+      U.renderInteractive(art, $("interactive-paper"));
+      $("interactive-result").hidden = false;
+    } else if (art.kind === "homework") {
+      U.renderHomework(art, $("homework-paper"));
+      $("homework-result").hidden = false;
+    } else if (art.kind === "geometry") {
+      U.renderGeometry(art);
+      $("geometry-result").hidden = false;
+      state.lastGeo = art;
+    }
+  }
+
+  /* ---------- 生成执行（本地/API） ---------- */
+  async function runGenerate(kind, params, generator) {
+    const cfg = state.settings;
+    if (cfg.engine === "api" && cfg.url && cfg.key) {
+      try {
+        const sys = "你是" + params.stageName + "优秀教师与课程设计专家，请基于国家课程标准生成专业、亲和、可直接使用的教学内容，使用中文，结构清晰。";
+        const user = "请为主题“" + params.topic + "”（" + params.subject + "，" + params.chapter + "）生成本节内容，要求专业严谨、语言亲切易懂。";
+        const text = await E.callApi({ url: cfg.url, model: cfg.model, key: cfg.key, system: sys, user });
+        const art = { kind, meta: { ...params, engine: "api" }, title: params.topic, subtitle: text.slice(0, 120) + "…", rawText: text };
+        renderArtifact(art);
+        addHistory(art);
+        U.success("已通过 API 深度生成");
+        saveRecent(art);
+        return art;
+      } catch (err) {
+        U.warn("API 调用失败（" + err.message + "），已自动回退本地引擎生成。");
+        saveRecent(null);
+      }
+    }
+    const art = generator();
+    renderArtifact(art);
+    addHistory(art);
+    saveRecent(art);
+    return art;
+  }
+
+  /* ---------- 课件表单 ---------- */
+  function initLesson() {
+    bindCascade("lesson");
+    $("lesson-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const stageId = $("lesson-stage").value;
+      const stage = C.stages.find((s) => s.id === stageId);
+      const subject = $("lesson-subject").value;
+      const version = $("lesson-version").value;
+      const chapter = $("lesson-chapter").value;
+      const topic = $("lesson-topic").value.trim() || chapter;
+      const gradeSel = $("lesson-grade");
+      const grade = gradeSel ? gradeSel.value : "";
+      if (topic.length > 80) { U.warn("主题太长了，请控制在 80 字以内。"); return; }
+      const btn = $("lesson-gen-btn");
+      btn.disabled = true; btn.textContent = "生成中…";
+      await runGenerate("lesson", { stageName: stage.name, grade, subject, version, chapter, topic }, () =>
+        E.generateLesson({ stageName: stage.name, grade, subject, version, chapter, topic }));
+      btn.disabled = false; btn.textContent = "生成课件";
+    });
+    $("lesson-regen").addEventListener("click", () => {
+      const art = E.generateLesson({
+        stageName: C.stages.find((s) => s.id === $("lesson-stage").value).name,
+        subject: $("lesson-subject").value, version: $("lesson-version").value,
+        chapter: $("lesson-chapter").value, topic: $("lesson-topic").value.trim() || $("lesson-chapter").value,
+      });
+      renderArtifact(art); addHistory(art);
+      U.success("已重新生成一组新内容");
+    });
+    $("lesson-print").addEventListener("click", () => {
+      if (state.lastArt.lesson) U.printArt(state.lastArt.lesson, "课件导出");
+    });
+  }
+
+  /* ---------- 互动表单 ---------- */
+  function initInteractive() {
+    bindCascade("interactive");
+    $("interactive-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const type = $("interactive-type").value;
+      const stageId = $("interactive-stage").value;
+      const stage = C.stages.find((s) => s.id === stageId);
+      const subject = $("interactive-subject").value;
+      const topic = $("interactive-topic").value.trim() || $("interactive-subject").value;
+      const chapter = "";
+      const count = $("interactive-count").value;
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = "生成中…";
+      const art = await runGenerate("interactive", { stageName: stage.name, subject, chapter, topic }, () =>
+        E.generateInteractive({ type, stageName: stage.name, subject, chapter, topic, count }));
+      if (art) { btn.disabled = false; btn.textContent = "生成互动活动"; }
+    });
+    $("interactive-print").addEventListener("click", () => {
+      if (state.lastArt.interactive) U.printArt(state.lastArt.interactive, "课堂互动包");
+    });
+  }
+
+  /* ---------- 作业表单 ---------- */
+  function initHomework() {
+    bindCascade("homework");
+    $("homework-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const stageId = $("homework-stage").value;
+      const stage = C.stages.find((s) => s.id === stageId);
+      const subject = $("homework-subject").value;
+      const topic = $("homework-topic").value.trim() || $("homework-subject").value;
+      const chapter = "";
+      const level = $("homework-level").value;
+      const count = $("homework-count").value;
+      const withAnswer = $("homework-answer").value;
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = "生成中…";
+      const art = await runGenerate("homework", { stageName: stage.name, subject, chapter, topic }, () =>
+        E.generateHomework({ stageName: stage.name, subject, chapter, topic, level, count, withAnswer }));
+      if (art) { btn.disabled = false; btn.textContent = "生成分层作业"; }
+    });
+    $("homework-print").addEventListener("click", () => {
+      if (state.lastArt.homework) U.printArt(state.lastArt.homework, "分层作业");
+    });
+  }
+
+  /* ---------- 几何表单 ---------- */
+  function initGeometry() {
+    const typeSel = $("geometry-type");
+    const shapeSel = $("geometry-shape");
+    const options = {
+      triangle: ["scalene", "right", "isosceles", "equilateral"],
+      quad: ["rectangle", "square", "rhombus", "trapezoid", "parallelogram"],
+      circle: ["circle"],
+    };
+    function fillShape() {
+      const type = typeSel.value;
+      const shapes = options[type] || options.triangle;
+      shapeSel.innerHTML = "";
+      const labels = {
+        scalene: "任意三角形", right: "直角三角形", isosceles: "等腰三角形", equilateral: "等边三角形",
+        rectangle: "矩形", square: "正方形", rhombus: "菱形", trapezoid: "梯形", parallelogram: "平行四边形", circle: "圆（半径可调）",
+      };
+      shapes.forEach((s) => {
+        const o = document.createElement("option"); o.value = s; o.textContent = labels[s] || s;
+        shapeSel.appendChild(o);
+      });
+    }
+    typeSel.addEventListener("change", fillShape);
+    fillShape();
+    $("geometry-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const type = typeSel.value;
+      const shape = shapeSel.value === "circle" ? "circle" : shapeSel.value;
+      const size = Number($("geometry-size").value) || 220;
+      const art = E.generateGeometry({ type, shape, size });
+      renderArtifact(art);
+      addHistory(art);
+      U.success(art.allPass ? "图形建模、渲染、验证全部通过" : "验证未全部通过，请调整参数");
+    });
+    $("geometry-download-svg").addEventListener("click", () => {
+      if (!state.lastGeo) return;
+      const svg = E.renderSVG(state.lastGeo);
+      U.downloadText("qike-geometry.svg", svg, "image/svg+xml;charset=utf-8");
+      U.success("SVG 已下载，可直接插入 Word / PPT / 课件");
+    });
+    $("geometry-print").addEventListener("click", () => {
+      if (!state.lastGeo) return;
+      const art = state.lastGeo;
+      const win = window.open("", "_blank");
+      if (!win) { U.warn("浏览器拦截了打印窗口，请允许弹出窗口后重试。"); return; }
+      const checks = art.checks.map((c) => `<div>${c.pass ? "✓" : "✗"} ${U.esc(c.name)}（${U.esc(c.detail)}）</div>`).join("");
+      win.document.write(`<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>几何图形 · ${U.esc(art.shape)}</title>
+        <style>body{font-family:sans-serif;margin:34px}h1{border-bottom:2px solid #1457d9;padding-bottom:8px}
+        .ok{color:#179863;font-weight:700}.fail{color:#d23b3b;font-weight:700}</style></head>
+        <body><h1>几何图形 · ${U.esc(art.shape)}</h1>
+        <div>验证结果：${art.allPass ? '<span class="ok">全部通过</span>' : '<span class="fail">有未通过项</span>'}</div>
+        <div style="margin:24px 0">${E.renderSVG(art)}</div>
+        <h2>验证报告</h2>${checks}</body></html>`);
+      win.document.close();
+      setTimeout(() => win.print(), 200);
+    });
+  }
+
+  /* ---------- 设置 ---------- */
+  function loadSettings() {
+    state.settings = Object.assign(state.settings, Store.get("settings", {}));
+    $("set-engine").value = state.settings.engine;
+    $("set-api-url").value = state.settings.url || "";
+    $("set-api-model").value = state.settings.model || "";
+    $("set-api-key").value = state.settings.key || "";
+  }
+  function initSettings() {
+    $("btn-settings").addEventListener("click", () => $("settings-drawer").hidden = false);
+    $("btn-help").addEventListener("click", () => $("help-drawer").hidden = false);
+    document.querySelectorAll(".drawer [data-close]").forEach((el) => {
+      el.addEventListener("click", () => el.closest(".drawer").hidden = true);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".drawer").forEach((d) => { d.hidden = true; });
+        const navMobile = $("topnav");
+        if (navMobile.classList.contains("open")) navMobile.classList.remove("open");
+      }
+    });
+    $("settings-save").addEventListener("click", () => {
+      state.settings = {
+        engine: $("set-engine").value,
+        url: $("set-api-url").value.trim(),
+        model: $("set-api-model").value.trim(),
+        key: $("set-api-key").value.trim(),
+      };
+      Store.set("settings", state.settings);
+      U.success("设置已保存（仅存于本机浏览器）");
+      $("settings-drawer").hidden = true;
+    });
+    $("settings-reset").addEventListener("click", () => {
+      state.settings = { engine: "local", url: "", model: "", key: "" };
+      loadSettings();
+      Store.set("settings", state.settings);
+      U.success("已恢复默认：本地引擎");
+    });
+  }
+
+  /* ---------- 移动端汉堡 ---------- */
+  function initMobileNav() {
+    // 移动端用汉堡按钮：在 640px 以下把 brand 右侧显示汉堡。简易方案：点击品牌区域切换菜单
+    const toggle = document.createElement("button");
+    toggle.id = "nav-toggle";
+    toggle.className = "icon-btn";
+    toggle.setAttribute("aria-label", "菜单");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>';
+    const actions = document.querySelector(".topbar-actions");
+    actions.insertBefore(toggle, actions.firstChild);
+    toggle.addEventListener("click", () => {
+      const menu = $("topnav");
+      const open = menu.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+    document.querySelectorAll(".nav-btn").forEach((b) => {
+      b.addEventListener("click", () => {
+        const menu = $("topnav");
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  /* ---------- 快速入口 & 启动 ---------- */
+  function initQuickCards() {
+    document.querySelectorAll(".quick-card").forEach((c) => {
+      c.addEventListener("click", () => switchView(c.dataset.goto));
+    });
+  }
+
+  function init() {
+    initLesson(); initInteractive(); initHomework(); initGeometry();
+    initSettings(); initMobileNav(); initQuickCards();
+    // 导航
+    document.querySelectorAll(".nav-btn").forEach((b) => {
+      b.addEventListener("click", () => switchView(b.dataset.view));
+    });
+    $("btn-clear-history").addEventListener("click", clearHistory);
+    $("history-list").addEventListener("click", (e) => {
+      const openBtn = e.target.closest(".h-open");
+      const delBtn = e.target.closest(".h-del");
+      if (openBtn) openHistory(openBtn.dataset.id);
+      else if (delBtn) deleteHistory(delBtn.dataset.id);
+    });
+    state.history = Store.get("history", []);
+    renderHistory();
+    loadSettings();
+    switchView("dashboard");
+    // 亲和力欢迎语
+    const hour = new Date().getHours();
+    const greet = hour < 6 ? "夜深了，备课辛苦了" : hour < 12 ? "早上好，新的一天从好课开始" : hour < 18 ? "下午好，备完课也别忘了休息" : "晚上好，今天的课堂辛苦了";
+    const kicker = document.getElementById("dashboard-title");
+    if (kicker && !kicker.dataset.custom) kicker.textContent = greet + " 👋";
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
